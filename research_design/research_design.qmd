@@ -1,5 +1,5 @@
 ---
-title: "Quarto test project"
+title: "Research Design Outline"
 ---
 
 ## Quarto
