@@ -1,0 +1,463 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  letterpaper,
+  DIV=11,
+  numbers=noendperiod]{scrartcl}
+
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else  
+    % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+\KOMAoption{captions}{tableheading}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+
+\usepackage{bookmark}
+
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Research Design Outline},
+  pdfauthor={Matteo Mazzarelli},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\title{Research Design Outline}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Detecting Bots on Reddit\\
+Computational Social Science}
+\author{Matteo Mazzarelli}
+\date{January 27, 2025}
+
+\begin{document}
+\maketitle
+
+
+\subsection{1. Research Question, Societal \& Scientific
+Relevance}\label{research-question-societal-scientific-relevance}
+
+\textbf{Research Question:} How do bots influence discussions and
+information sharing within Reddit communities (subreddits)?
+
+\textbf{Hypotheses:}
+
+\begin{itemize}
+\tightlist
+\item
+  Bots amplify specific narratives.
+\item
+  Bots contribute to polarization/echo chambers.
+\end{itemize}
+
+\textbf{Relevance:}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Societal Relevance:} This research is relevant for combating
+  misinformation, maintaining healthy online communities, and
+  understanding public discourse manipulation. As social media platforms
+  become increasingly influential in shaping public opinion, it is
+  crucial to understand the role of automated accounts in these spaces.
+  Bots can be used to spread propaganda, manipulate trends, and create
+  an illusion of consensus, potentially leading to harmful real-world
+  consequences.
+\item
+  \textbf{Scientific Relevance:} This study contributes to the
+  understanding of online social influence, bot detection, and
+  information diffusion on Reddit. It can help refine existing bot
+  detection methods and provide insights into how information,
+  particularly misinformation, spreads within online communities. The
+  findings can inform the development of strategies to mitigate the
+  negative impacts of bots on online discourse.
+\end{itemize}
+
+\subsection{2. Data \& Measurement \& Planned
+Analyses}\label{data-measurement-planned-analyses}
+
+\subsubsection{Data}\label{data}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Source:} Reddit API (using the Python Reddit API Wrapper,
+  PRAW)
+\item
+  \textbf{Subreddits:} Selection based on a scoring system that
+  considers both the number of subscribers and the presence of keywords
+  associated with topics likely to be targeted by bots (e.g., politics,
+  elections, news, war, vaccines, conspiracy, finance, etc.). The list
+  of keywords can be generated with the help of a large language model
+  (e.g.~Gemini) tuned for reproducibility (stochastic parameters such as
+  Temperature turned to 0) and includes:
+\end{itemize}
+
+\begin{verbatim}
+politics elections government news worldnews
+conspiracy war military vaccines health
+covid finance crypto stocks technology
+ai socialmedia propaganda disinformation activism
+\end{verbatim}
+
+The top 10 subreddits based on this scoring system are:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+& Name & Subscribers & Submission Type & Bot Score \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+3 & worldnews & 43565302 & link & 5 \\
+13 & news & 29223434 & link & 4 \\
+15 & videos & 26808936 & link & 4 \\
+22 & AmItheAsshole & 23083122 & self & 4 \\
+23 & explainlikeimfive & 22977358 & self & 4 \\
+26 & Art & 22367695 & link & 4 \\
+27 & sports & 21708101 & link & 4 \\
+28 & dataisbeautiful & 21402346 & link & 4 \\
+30 & personalfinance & 20265058 & self & 4 \\
+31 & UpliftingNews & 20189860 & link & 4 \\
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Collection:} Data collected includes posts, comments, user
+  data (if available), and timestamps.
+\end{itemize}
+
+\subsubsection{Measurement}\label{measurement}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Bot Identification:} A heuristic approach will be used to
+  identify potential bots. This approach will consider factors such as
+  account age, karma, post frequency, and repetitive content. For
+  instance, accounts with very low karma, extremely high posting
+  frequency, or those exhibiting highly repetitive posting patterns may
+  be flagged as potential bots.
+\item
+  \textbf{Analysis:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Descriptive:} The prevalence of bots within the selected
+    subreddits will be estimated. Content analysis will be performed to
+    compare the content generated by suspected bots versus human users.
+    Engagement patterns (e.g., upvotes, downvotes, comment frequency) of
+    suspected bots will be analyzed.
+  \item
+    \textbf{Inferential:} Correlation analysis will be conducted to
+    examine the relationship between bot activity and various factors,
+    such as the prevalence of specific narratives or the level of
+    polarization within discussions.
+  \end{itemize}
+\end{itemize}
+
+\subsection{3. Challenges \& Open
+Questions}\label{challenges-open-questions}
+
+\subsubsection{Challenges}\label{challenges}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Difficult Bot Detection on Reddit:} Reddit's relative
+  anonymity and the limited availability of tools compared to other
+  platforms make bot detection challenging.
+\item
+  \textbf{Creating a Reliable ``Ground Truth'' Dataset:} There is no
+  readily available ``ground truth'' dataset for bot detection on
+  Reddit. This makes it difficult to train and evaluate bot detection
+  models.
+\item
+  \textbf{Data Access Uncertainties:} The Reddit API has rate limits,
+  which may affect the amount of data that can be collected within a
+  given timeframe.
+\end{itemize}
+
+\subsubsection{Discussion}\label{discussion}
+
+The chosen methods and data have limitations. The heuristic approach to
+bot detection is not perfect and may result in misclassification. The
+reliance on the Reddit API introduces potential biases, as the API may
+not provide a completely representative sample of Reddit activity.
+
+The findings of this study could have implications for Reddit and
+platform policies. If a significant presence of bots is found to be
+influencing discussions, Reddit may need to implement stricter measures
+to detect and remove bots. The findings could also inform broader
+discussions about platform governance and the responsibility of social
+media companies in mitigating the spread of misinformation.
+
+\subsubsection{Open Questions}\label{open-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  How can bot detection on Reddit be improved, given the platform's
+  unique characteristics?
+\item
+  What are the most effective strategies to counter the influence of
+  bots on Reddit and other online platforms?
+\end{itemize}
+
+\subsection{4. Population (Target)}\label{population-target}
+
+The target population is users of the social media platform Reddit,
+specifically those participating in subreddits related to topics often
+targeted by bots, such as news, politics, and finance. This includes
+both human users and automated accounts (bots).
+
+\subsection{5. Sample}\label{sample}
+
+The sample consists of data collected from the top 10 subreddits
+identified as most vulnerable to bot influence, based on the scoring
+system described in the ``Data'' section. These subreddits are selected
+based on their large subscriber base and the presence of keywords
+related to bot-targeted topics in their descriptions.
+
+\subsection{6. Unit}\label{unit}
+
+The fundamental units of analysis are individual posts and comments
+within the selected subreddits. The analysis will consider both
+individual users (or suspected bots) as well as aggregate patterns
+within each subreddit.
+
+\subsection{7. Data/Observations}\label{dataobservations}
+
+The data collected includes posts and comments from the selected
+subreddits, along with associated metadata such as timestamps, user
+information (where available), and engagement metrics (upvotes,
+downvotes). The data is structured as a combination of cross-sectional
+(snapshot of activity at a given time) and panel data (tracking posts
+and comments over time). For example, a post's initial reception can be
+captured (cross-sectional), while changes in engagement over time can
+also be tracked (panel).
+
+\subsection{8. Measurement}\label{measurement-1}
+
+The different variables are measured as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Bot Activity:} Measured through a heuristic approach based on
+  user account data and posting behavior.
+\item
+  \textbf{Narrative Amplification:} Measured by analyzing the frequency
+  and prominence of specific keywords and phrases in posts and comments.
+\item
+  \textbf{Polarization/Echo Chambers:} Measured by analyzing the
+  sentiment and language used in discussions, as well as the network
+  structure of interactions between users (e.g., identifying clusters of
+  users who primarily interact with each other).
+\end{itemize}
+
+\subsection{9. Machine Learning Method}\label{machine-learning-method}
+
+While the primary focus is not on building a machine learning model,
+descriptive and inferential analysis will be conducted. These could
+include:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Descriptive Statistics:} Calculating the prevalence of
+  suspected bots, analyzing the distribution of post and comment
+  lengths, and examining engagement patterns.
+\item
+  \textbf{Correlation Analysis:} Investigating the relationship between
+  bot activity and other variables, such as the frequency of specific
+  narratives or the level of polarization.
+\end{itemize}
+
+\subsection{10. ML Model \& Unit of Analysis \&
+Estimation}\label{ml-model-unit-of-analysis-estimation}
+
+As the main analysis is not focused on machine learning, this section is
+not applicable.
+
+\subsection{11. Theory/Mechanisms}\label{theorymechanisms}
+
+The underlying theory is that bots can be used to manipulate online
+discussions by amplifying specific narratives, creating echo chambers,
+and influencing public opinion. This is achieved through various
+mechanisms, such as:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Agenda Setting:} Bots can artificially inflate the visibility
+  of certain topics by posting frequently and generating engagement
+  (e.g., upvotes, comments).
+\item
+  \textbf{Framing:} Bots can promote specific interpretations of events
+  or issues by using particular language and framing techniques.
+\item
+  \textbf{Social Proof:} Bots can create the illusion of consensus or
+  popularity by mimicking human behavior and interacting with other
+  users.
+\end{itemize}
+
+\subsection{12. Training/Testing}\label{trainingtesting}
+
+Not applicable as the main focus is not on building a machine learning
+model.
+
+\subsection{13. Assessment of Accuracy}\label{assessment-of-accuracy}
+
+Not applicable.
+
+\subsection{14. Previous Studies}\label{previous-studies}
+
+Previous research on bot detection and influence on social media will be
+reviewed. This includes studies on platforms like Twitter and Facebook,
+as well as research on Reddit. The literature review will focus on
+identifying different bot detection methods, analyzing the impact of
+bots on online discussions, and understanding the mechanisms through
+which bots exert influence. This will help inform the current study's
+methodology and provide a context for interpreting the findings.
+
+
+
+
+\end{document}
