@@ -1,7 +1,23 @@
 ---
 title: "Research Design Outline"
+subtitle: "Computational Social Science"
+author: "Matteo Mazzarelli"
+date: "01/27/2025"
+date-format: long
+format:
+	pdf:
+		link-citations: true
+		keep-tex: true
+		pdf-engine: xelatex
+execute:
+	cache: true
+bibliography: extra/references.bib
+csl: extra/apa7-numeric-superscript-brackets-nocommas.csl
+nocite: |
+	@*
 ---
 
 ## Quarto
 
 Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
