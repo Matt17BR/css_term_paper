@@ -25,7 +25,11 @@ format:
         link-citations: true
         keep-tex: true
         pdf-engine: latexmk
-        # pdf-engine-opt: -interaction=nonstopmode
+        pdf-engine-opts: 
+            - "-lualatex"
+            - "-f"
+            - "-gg"
+            # - "-interaction=nonstopmode"
 execute:
     cache: true
     # echo: false
