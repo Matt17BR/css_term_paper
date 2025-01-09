@@ -40,6 +40,7 @@
   \KOMAoptions{parskip=half}}
 \makeatother
 \usepackage{xcolor}
+\usepackage[top=1.5cm,bottom=3cm,hmargin=2.5cm]{geometry}
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
 % Make \paragraph and \subparagraph free-standing
@@ -66,6 +67,46 @@
 \fi
 \makeatother
 
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{241,243,245}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.40,0.45,0.13}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.28,0.35,0.67}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.46,0.62}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.07,0.07,0.07}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
 
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
@@ -94,6 +135,11 @@
 \def\fps@figure{htbp}
 \makeatother
 
+\usepackage{fvextra}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{
+    commandchars=\\\{\},
+    breaklines, breaknonspaceingroup, breakanywhere
+}
 \KOMAoption{captions}{tableheading}
 \makeatletter
 \@ifpackageloaded{caption}{}{\usepackage{caption}}
@@ -168,73 +214,276 @@ Computational Social Science}
 \maketitle
 
 
-\subsection{1. Research Question, Societal \& Scientific
-Relevance}\label{research-question-societal-scientific-relevance}
+\section{Research Question \&
+Relevance}\label{research-question-relevance}
 
-\textbf{Research Question:} How do bots influence discussions and
-information sharing within Reddit communities (subreddits)?
+\textbf{Research Question:} Can basic heuristic methods effectively
+identify bot influence on Reddit discussions?
 
 \textbf{Hypotheses:}
 
 \begin{itemize}
 \tightlist
 \item
-  Bots amplify specific narratives.
+  Account activity heuristics can identify probable bot accounts.
 \item
-  Bots contribute to polarization/echo chambers.
+  These accounts may amplify specific narratives or contribute to online
+  polarization.
 \end{itemize}
 
-\textbf{Relevance:}
+\textbf{Relevance:} This study is a preliminary investigation into using
+simple methods for detecting and analyzing potential bot activity on
+Reddit. The findings will inform the need for more sophisticated methods
+to understand bots' broader impact on online discourse.
+
+\section{Data \& Measurement}\label{data-measurement}
+
+\subsection{Data}\label{data}
 
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Societal Relevance:} This research is relevant for combating
-  misinformation, maintaining healthy online communities, and
-  understanding public discourse manipulation. As social media platforms
-  become increasingly influential in shaping public opinion, it is
-  crucial to understand the role of automated accounts in these spaces.
-  Bots can be used to spread propaganda, manipulate trends, and create
-  an illusion of consensus, potentially leading to harmful real-world
-  consequences.
+  \textbf{Source:} Reddit API via the Python Reddit API Wrapper (PRAW).
 \item
-  \textbf{Scientific Relevance:} This study contributes to the
-  understanding of online social influence, bot detection, and
-  information diffusion on Reddit. It can help refine existing bot
-  detection methods and provide insights into how information,
-  particularly misinformation, spreads within online communities. The
-  findings can inform the development of strategies to mitigate the
-  negative impacts of bots on online discourse.
+  \textbf{Subreddits:} Selected for high subscriber counts and relevance
+  to bot-targeted topics (e.g., politics, news). Keywords for selection
+  will be generated using a reproducible method with Google Gemini (see
+  Appendix for prompt and code). Subreddits will be scored as detailed
+  in the appendix.
+\item
+  \textbf{Collection:} Posts, comments, timestamps, and available user
+  data like account age and karma.
 \end{itemize}
 
-\subsection{2. Data \& Measurement \& Planned
-Analyses}\label{data-measurement-planned-analyses}
-
-\subsubsection{Data}\label{data}
+\subsection{Measurement}\label{measurement}
 
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Source:} Reddit API (using the Python Reddit API Wrapper,
-  PRAW)
+  \textbf{Bot Identification (Heuristics):} Accounts flagged as
+  potential bots if they exhibit:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Young account age.
+  \item
+    Unusually low/high karma.
+  \item
+    High posting frequency.
+  \item
+    Repetitive content.
+  \end{itemize}
 \item
-  \textbf{Subreddits:} Selection based on a scoring system that
-  considers both the number of subscribers and the presence of keywords
-  associated with topics likely to be targeted by bots (e.g., politics,
-  elections, news, war, vaccines, conspiracy, finance, etc.). The list
-  of keywords can be generated with the help of a large language model
-  (e.g.~Gemini) tuned for reproducibility (stochastic parameters such as
-  Temperature turned to 0) and includes:
+  \textbf{Analysis:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Descriptive:} Estimate bot prevalence, compare content from
+    suspected bots versus humans, and analyze bot engagement patterns.
+  \item
+    \textbf{Inferential:} Explore correlations between bot activity and
+    narrative amplification (via keyword analysis) or polarization (via
+    sentiment analysis).
+  \item
+    \textbf{Accuracy Evaluation:} If feasible, build classification
+    models and assess using cross-validation. Test various heuristic
+    combinations, evaluating their performance with standard
+    classification metrics.
+  \end{itemize}
 \end{itemize}
+
+\section{Methodology: Challenges, Evaluation, and
+Scope}\label{methodology-challenges-evaluation-and-scope}
+
+\subsection{Population \& Sample}\label{population-sample}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Population:} Reddit users, especially in subreddits related to
+  topics often targeted by bots.
+\item
+  \textbf{Sample:} Data from selected subreddits as outlined in the
+  ``Data'' section.
+\end{itemize}
+
+\subsection{Challenges \& Limitations}\label{challenges-limitations}
+
+Identifying Reddit bots is difficult because of user anonymity, as well
+as limited API access for data collection, and the inherent inaccuracy
+of heuristic detection methods. This study prioritizes a feasible
+approach, rigorously evaluating the accuracy of heuristics while
+transparently addressing all limitations. Ethical issues are also
+considered: only publicly available data will be used, and usernames
+will be anonymized to protect user privacy. The methodology, including
+limitations of bot identification, will be documented transparently.
+
+\subsection{Key Variable Measurement}\label{key-variable-measurement}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Bot Activity:} Identified using heuristics such as account
+  age, karma, and posting behavior.
+\item
+  \textbf{Narrative Amplification:} Measured by frequency of keywords
+  linked to specific narratives.
+\item
+  \textbf{Polarization:} Assessed using sentiment analysis on discussion
+  content.
+\end{itemize}
+
+\subsection{Evaluation of Bot
+Detection}\label{evaluation-of-bot-detection}
+
+The effectiveness of the heuristics will be thoroughly evaluated,
+including testing different combinations. We will explore leveraging
+Large Language Models to refine detection. If feasible, simple
+classification models will be developed and their performance assessed
+using standard accuracy metrics, offering a quantitative evaluation of
+the bot detection's effectiveness.
+
+\subsection{Expected Outcomes}\label{expected-outcomes}
+
+This research aims to establish the feasibility of using basic
+heuristics for bot detection on Reddit and provide preliminary insights
+into their potential influence on discussions, particularly regarding
+narrative amplification and polarization. The primary limitations will
+be the accuracy of the heuristics and the generalizability of the
+results to all of Reddit.
+
+\newpage
+
+\section{Appendix}\label{appendix}
+
+\subsection{Keyword Generation}\label{keyword-generation}
+
+The list of keywords can be generated with the help of a large language
+model API (e.g.~Gemini) tuned for reproducibility (stochastic parameters
+such as Temperature turned to 0) and includes:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ google.generativeai }\ImportTok{as}\NormalTok{ genai}
+\ImportTok{import}\NormalTok{ os}
+
+\NormalTok{genai.configure(api\_key}\OperatorTok{=}\NormalTok{os.environ[}\StringTok{"GEMINI\_API\_KEY"}\NormalTok{])}
+
+\CommentTok{\# Create the model}
+\NormalTok{generation\_config }\OperatorTok{=}\NormalTok{ \{}
+  \StringTok{"temperature"}\NormalTok{: }\DecValTok{0}\NormalTok{,}
+  \CommentTok{\# controls randomness.}
+  \CommentTok{\# 0 = most deterministic}
+  \CommentTok{\# (always selects highest probability token).}
+  \StringTok{"top\_p"}\NormalTok{: }\DecValTok{0}\NormalTok{,}
+  \CommentTok{\# nucleus sampling:}
+  \CommentTok{\# limits token selection to the most probable.}
+  \CommentTok{\# 0 = most deterministic (used when temperature \textgreater{} 0).}
+  \StringTok{"top\_k"}\NormalTok{: }\DecValTok{1}\NormalTok{,}
+  \CommentTok{\# restricts to top \textquotesingle{}k\textquotesingle{} tokens.}
+  \CommentTok{\# 1 = most deterministic (used when temperature \textgreater{} 0).}
+  \StringTok{"max\_output\_tokens"}\NormalTok{: }\DecValTok{8192}\NormalTok{,}
+  \StringTok{"response\_mime\_type"}\NormalTok{: }\StringTok{"text/plain"}\NormalTok{,}
+\NormalTok{\}}
+
+\NormalTok{model }\OperatorTok{=}\NormalTok{ genai.GenerativeModel(}
+\NormalTok{  model\_name}\OperatorTok{=}\StringTok{"gemini{-}exp{-}1206"}\NormalTok{,}
+  \CommentTok{\# best performing gemini model (see: https://livebench.ai)}
+  \CommentTok{\# api usage is basically unlimited and free of charge}
+\NormalTok{  generation\_config}\OperatorTok{=}\NormalTok{generation\_config,}
+\NormalTok{)}
+
+\ImportTok{import}\NormalTok{ praw}
+\ImportTok{import}\NormalTok{ pandas }\ImportTok{as}\NormalTok{ pd}
+
+\NormalTok{reddit }\OperatorTok{=}\NormalTok{ praw.Reddit(}
+\NormalTok{    client\_id}\OperatorTok{=}\NormalTok{os.environ[}\StringTok{"PRAW\_CLIENT\_ID"}\NormalTok{],}
+\NormalTok{    client\_secret}\OperatorTok{=}\NormalTok{os.environ[}\StringTok{"PRAW\_CLIENT\_SECRET"}\NormalTok{],}
+\NormalTok{    user\_agent}\OperatorTok{=}\NormalTok{os.environ[}\StringTok{"PRAW\_USER\_AGENT"}\NormalTok{],}
+\NormalTok{    username}\OperatorTok{=}\NormalTok{os.environ[}\StringTok{"PRAW\_USERNAME"}\NormalTok{],}
+\NormalTok{    password}\OperatorTok{=}\NormalTok{os.environ[}\StringTok{"PRAW\_PASSWORD"}\NormalTok{],}
+\NormalTok{)}
+
+\CommentTok{\# Fetch a large subset of popular subreddits}
+\CommentTok{\# (large limit makes this representative of}
+\CommentTok{\# the largest overall subreddits by subscribers,}
+\CommentTok{\# check: https://gummysearch.com/tools/top{-}subreddits/)}
+\NormalTok{subreddits }\OperatorTok{=} \BuiltInTok{list}\NormalTok{(reddit.subreddits.popular(limit}\OperatorTok{=}\DecValTok{1000}\NormalTok{))}
+
+\CommentTok{\# Create a DataFrame containing generated subs list}
+\NormalTok{subs\_df }\OperatorTok{=}\NormalTok{ pd.DataFrame([\{}
+    \StringTok{"Name"}\NormalTok{: subreddit.display\_name,}
+    \StringTok{"Subscribers"}\NormalTok{: subreddit.subscribers,}
+    \StringTok{"Description"}\NormalTok{: subreddit.public\_description,}
+    \StringTok{"Over 18"}\NormalTok{: subreddit.over18,}
+    \StringTok{"Submission Type"}\NormalTok{: subreddit.submission\_type}
+\NormalTok{\} }\ControlFlowTok{for}\NormalTok{ subreddit }\KeywordTok{in}\NormalTok{ subreddits]).sort\_values(}
+\NormalTok{    by}\OperatorTok{=}\StringTok{"Subscribers"}\NormalTok{, ascending}\OperatorTok{=}\VariableTok{False}\NormalTok{, ignore\_index}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+
+\ImportTok{import}\NormalTok{ ast}
+
+\NormalTok{chat\_session }\OperatorTok{=}\NormalTok{ model.start\_chat()}
+
+\NormalTok{response }\OperatorTok{=}\NormalTok{ chat\_session.send\_message(}\StringTok{"What are some keywords I can use to create a list of subreddits which are likely to be influenced by bots because of their controversial nature? These are keywords that I would look for within a subreddit\textquotesingle{}s name or description. For example: }\CharTok{\textbackslash{}"}\StringTok{news}\CharTok{\textbackslash{}"}\StringTok{, }\CharTok{\textbackslash{}"}\StringTok{politics}\CharTok{\textbackslash{}"}\StringTok{, }\CharTok{\textbackslash{}"}\StringTok{discussion}\CharTok{\textbackslash{}"}\StringTok{, }\CharTok{\textbackslash{}"}\StringTok{war}\CharTok{\textbackslash{}"}\StringTok{, }\CharTok{\textbackslash{}"}\StringTok{vaccines}\CharTok{\textbackslash{}"}\StringTok{, }\CharTok{\textbackslash{}"}\StringTok{controversial}\CharTok{\textbackslash{}"}\StringTok{, }\CharTok{\textbackslash{}"}\StringTok{conflict}\CharTok{\textbackslash{}"}\StringTok{, etc.}\CharTok{\textbackslash{}n\textbackslash{}n}\StringTok{Keep the answer short, only including 50 keywords and saving them in a python list as follows [}\CharTok{\textbackslash{}"}\StringTok{key1}\CharTok{\textbackslash{}"}\StringTok{,}\CharTok{\textbackslash{}"}\StringTok{key2}\CharTok{\textbackslash{}"}\StringTok{,...]. Send the output as text not as code."}\NormalTok{)}
+
+\NormalTok{bot\_influence\_keywords }\OperatorTok{=}\NormalTok{ ast.literal\_eval(response.candidates[}\DecValTok{0}\NormalTok{].content.parts[}\DecValTok{0}\NormalTok{].text.replace(}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\StringTok{""}\NormalTok{))}
+
+\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{0}\NormalTok{, }\BuiltInTok{len}\NormalTok{(bot\_influence\_keywords), }\DecValTok{5}\NormalTok{):}
+    \BuiltInTok{print}\NormalTok{(}\OperatorTok{*}\NormalTok{bot\_influence\_keywords[i:i}\OperatorTok{+}\DecValTok{5}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{verbatim}
-politics elections government news worldnews
-conspiracy war military vaccines health
-covid finance crypto stocks technology
-ai socialmedia propaganda disinformation activism
+news politics discussion war vaccines
+controversial conflict debate opinion world
+current events election government policy social
+media conspiracy activism protest rights
+freedom censorship propaganda misinformation disinformation
+fake news bias ideology partisan left
+right conservative liberal progressive republican
+democrat socialism capitalism communism fascism
+anarchy global national security privacy
+surveillance technology science health
 \end{verbatim}
 
+\subsection{Selected Subreddits}\label{selected-subreddits}
+
 The top 10 subreddits based on this scoring system are:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Score subreddits based on subscribers and keywords in description}
+\KeywordTok{def}\NormalTok{ calculate\_bot\_influence\_score(row):}
+\NormalTok{    score }\OperatorTok{=} \DecValTok{0}
+    
+    \CommentTok{\# Large subscriber base increases potential for bot activity}
+    \ControlFlowTok{if}\NormalTok{ row[}\StringTok{\textquotesingle{}Subscribers\textquotesingle{}}\NormalTok{] }\OperatorTok{\textgreater{}} \DecValTok{10000000}\NormalTok{:}
+\NormalTok{        score }\OperatorTok{+=} \DecValTok{5}
+    \ControlFlowTok{elif}\NormalTok{ row[}\StringTok{\textquotesingle{}Subscribers\textquotesingle{}}\NormalTok{] }\OperatorTok{\textgreater{}} \DecValTok{5000000}\NormalTok{:}
+\NormalTok{        score }\OperatorTok{+=} \DecValTok{4}
+    \ControlFlowTok{elif}\NormalTok{ row[}\StringTok{\textquotesingle{}Subscribers\textquotesingle{}}\NormalTok{] }\OperatorTok{\textgreater{}} \DecValTok{1000000}\NormalTok{:}
+\NormalTok{        score }\OperatorTok{+=} \DecValTok{3}
+        
+    \CommentTok{\# Check for keywords in description and subreddit name}
+\NormalTok{    description }\OperatorTok{=}\NormalTok{ row[}\StringTok{\textquotesingle{}Description\textquotesingle{}}\NormalTok{].lower()}
+\NormalTok{    sub\_name }\OperatorTok{=}\NormalTok{ row[}\StringTok{\textquotesingle{}Name\textquotesingle{}}\NormalTok{].lower()}
+    \ControlFlowTok{for}\NormalTok{ keyword }\KeywordTok{in}\NormalTok{ bot\_influence\_keywords:}
+        \ControlFlowTok{if}\NormalTok{ keyword }\KeywordTok{in}\NormalTok{ description:}
+\NormalTok{            score }\OperatorTok{+=} \DecValTok{1}
+        \ControlFlowTok{if}\NormalTok{ keyword }\KeywordTok{in}\NormalTok{ sub\_name:}
+\NormalTok{            score }\OperatorTok{+=} \DecValTok{1}
+            
+    \ControlFlowTok{return}\NormalTok{ score}
+
+\NormalTok{subs\_df[}\StringTok{\textquotesingle{}Bot Score\textquotesingle{}}\NormalTok{] }\OperatorTok{=}\NormalTok{ subs\_df.}\BuiltInTok{apply}\NormalTok{(calculate\_bot\_influence\_score, axis}\OperatorTok{=}\DecValTok{1}\NormalTok{)}
+
+\CommentTok{\# Get top 10 most vulnerable subreddits}
+\NormalTok{top\_vulnerable }\OperatorTok{=}\NormalTok{ subs\_df.nlargest(}\DecValTok{10}\NormalTok{, }\StringTok{\textquotesingle{}Bot Score\textquotesingle{}}\NormalTok{)[[}\StringTok{\textquotesingle{}Name\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Subscribers\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Submission Type\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Bot Score\textquotesingle{}}\NormalTok{]].reset\_index(drop}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+\NormalTok{top\_vulnerable}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{longtable}[]{@{}lllll@{}}
 \toprule\noalign{}
@@ -243,219 +492,17 @@ The top 10 subreddits based on this scoring system are:
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-3 & worldnews & 43565302 & link & 5 \\
-13 & news & 29223434 & link & 4 \\
-15 & videos & 26808936 & link & 4 \\
-22 & AmItheAsshole & 23083122 & self & 4 \\
-23 & explainlikeimfive & 22977358 & self & 4 \\
-26 & Art & 22367695 & link & 4 \\
-27 & sports & 21708101 & link & 4 \\
-28 & dataisbeautiful & 21402346 & link & 4 \\
-30 & personalfinance & 20265058 & self & 4 \\
-31 & UpliftingNews & 20189860 & link & 4 \\
+0 & worldnews & 43568694 & link & 9 \\
+1 & news & 29225132 & link & 9 \\
+2 & technology & 17726871 & any & 9 \\
+3 & science & 33423695 & link & 8 \\
+4 & AmItheAsshole & 23088618 & self & 8 \\
+5 & politics & 8694945 & link & 8 \\
+6 & movies & 34170875 & any & 7 \\
+7 & askscience & 25977459 & self & 7 \\
+8 & sports & 21709169 & link & 7 \\
+9 & UpliftingNews & 20190302 & link & 7 \\
 \end{longtable}
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Collection:} Data collected includes posts, comments, user
-  data (if available), and timestamps.
-\end{itemize}
-
-\subsubsection{Measurement}\label{measurement}
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Bot Identification:} A heuristic approach will be used to
-  identify potential bots. This approach will consider factors such as
-  account age, karma, post frequency, and repetitive content. For
-  instance, accounts with very low karma, extremely high posting
-  frequency, or those exhibiting highly repetitive posting patterns may
-  be flagged as potential bots.
-\item
-  \textbf{Analysis:}
-
-  \begin{itemize}
-  \tightlist
-  \item
-    \textbf{Descriptive:} The prevalence of bots within the selected
-    subreddits will be estimated. Content analysis will be performed to
-    compare the content generated by suspected bots versus human users.
-    Engagement patterns (e.g., upvotes, downvotes, comment frequency) of
-    suspected bots will be analyzed.
-  \item
-    \textbf{Inferential:} Correlation analysis will be conducted to
-    examine the relationship between bot activity and various factors,
-    such as the prevalence of specific narratives or the level of
-    polarization within discussions.
-  \end{itemize}
-\end{itemize}
-
-\subsection{3. Challenges \& Open
-Questions}\label{challenges-open-questions}
-
-\subsubsection{Challenges}\label{challenges}
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Difficult Bot Detection on Reddit:} Reddit's relative
-  anonymity and the limited availability of tools compared to other
-  platforms make bot detection challenging.
-\item
-  \textbf{Creating a Reliable ``Ground Truth'' Dataset:} There is no
-  readily available ``ground truth'' dataset for bot detection on
-  Reddit. This makes it difficult to train and evaluate bot detection
-  models.
-\item
-  \textbf{Data Access Uncertainties:} The Reddit API has rate limits,
-  which may affect the amount of data that can be collected within a
-  given timeframe.
-\end{itemize}
-
-\subsubsection{Discussion}\label{discussion}
-
-The chosen methods and data have limitations. The heuristic approach to
-bot detection is not perfect and may result in misclassification. The
-reliance on the Reddit API introduces potential biases, as the API may
-not provide a completely representative sample of Reddit activity.
-
-The findings of this study could have implications for Reddit and
-platform policies. If a significant presence of bots is found to be
-influencing discussions, Reddit may need to implement stricter measures
-to detect and remove bots. The findings could also inform broader
-discussions about platform governance and the responsibility of social
-media companies in mitigating the spread of misinformation.
-
-\subsubsection{Open Questions}\label{open-questions}
-
-\begin{itemize}
-\tightlist
-\item
-  How can bot detection on Reddit be improved, given the platform's
-  unique characteristics?
-\item
-  What are the most effective strategies to counter the influence of
-  bots on Reddit and other online platforms?
-\end{itemize}
-
-\subsection{4. Population (Target)}\label{population-target}
-
-The target population is users of the social media platform Reddit,
-specifically those participating in subreddits related to topics often
-targeted by bots, such as news, politics, and finance. This includes
-both human users and automated accounts (bots).
-
-\subsection{5. Sample}\label{sample}
-
-The sample consists of data collected from the top 10 subreddits
-identified as most vulnerable to bot influence, based on the scoring
-system described in the ``Data'' section. These subreddits are selected
-based on their large subscriber base and the presence of keywords
-related to bot-targeted topics in their descriptions.
-
-\subsection{6. Unit}\label{unit}
-
-The fundamental units of analysis are individual posts and comments
-within the selected subreddits. The analysis will consider both
-individual users (or suspected bots) as well as aggregate patterns
-within each subreddit.
-
-\subsection{7. Data/Observations}\label{dataobservations}
-
-The data collected includes posts and comments from the selected
-subreddits, along with associated metadata such as timestamps, user
-information (where available), and engagement metrics (upvotes,
-downvotes). The data is structured as a combination of cross-sectional
-(snapshot of activity at a given time) and panel data (tracking posts
-and comments over time). For example, a post's initial reception can be
-captured (cross-sectional), while changes in engagement over time can
-also be tracked (panel).
-
-\subsection{8. Measurement}\label{measurement-1}
-
-The different variables are measured as follows:
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Bot Activity:} Measured through a heuristic approach based on
-  user account data and posting behavior.
-\item
-  \textbf{Narrative Amplification:} Measured by analyzing the frequency
-  and prominence of specific keywords and phrases in posts and comments.
-\item
-  \textbf{Polarization/Echo Chambers:} Measured by analyzing the
-  sentiment and language used in discussions, as well as the network
-  structure of interactions between users (e.g., identifying clusters of
-  users who primarily interact with each other).
-\end{itemize}
-
-\subsection{9. Machine Learning Method}\label{machine-learning-method}
-
-While the primary focus is not on building a machine learning model,
-descriptive and inferential analysis will be conducted. These could
-include:
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Descriptive Statistics:} Calculating the prevalence of
-  suspected bots, analyzing the distribution of post and comment
-  lengths, and examining engagement patterns.
-\item
-  \textbf{Correlation Analysis:} Investigating the relationship between
-  bot activity and other variables, such as the frequency of specific
-  narratives or the level of polarization.
-\end{itemize}
-
-\subsection{10. ML Model \& Unit of Analysis \&
-Estimation}\label{ml-model-unit-of-analysis-estimation}
-
-As the main analysis is not focused on machine learning, this section is
-not applicable.
-
-\subsection{11. Theory/Mechanisms}\label{theorymechanisms}
-
-The underlying theory is that bots can be used to manipulate online
-discussions by amplifying specific narratives, creating echo chambers,
-and influencing public opinion. This is achieved through various
-mechanisms, such as:
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Agenda Setting:} Bots can artificially inflate the visibility
-  of certain topics by posting frequently and generating engagement
-  (e.g., upvotes, comments).
-\item
-  \textbf{Framing:} Bots can promote specific interpretations of events
-  or issues by using particular language and framing techniques.
-\item
-  \textbf{Social Proof:} Bots can create the illusion of consensus or
-  popularity by mimicking human behavior and interacting with other
-  users.
-\end{itemize}
-
-\subsection{12. Training/Testing}\label{trainingtesting}
-
-Not applicable as the main focus is not on building a machine learning
-model.
-
-\subsection{13. Assessment of Accuracy}\label{assessment-of-accuracy}
-
-Not applicable.
-
-\subsection{14. Previous Studies}\label{previous-studies}
-
-Previous research on bot detection and influence on social media will be
-reviewed. This includes studies on platforms like Twitter and Facebook,
-as well as research on Reddit. The literature review will focus on
-identifying different bot detection methods, analyzing the impact of
-bots on online discussions, and understanding the mechanisms through
-which bots exert influence. This will help inform the current study's
-methodology and provide a context for interpreting the findings.
 
 
 

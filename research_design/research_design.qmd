@@ -8,38 +8,93 @@ date: 01/27/2025
 date-format: long
 format:
     pdf:
+        include-in-header: 
+            text: |
+                \usepackage{fvextra}
+                \DefineVerbatimEnvironment{Highlighting}{Verbatim}{
+                    commandchars=\\\{\},
+                    breaklines, breaknonspaceingroup, breakanywhere
+                }
+        geometry:
+            - top=1.5cm
+            - bottom=3cm
+            - hmargin=2.5cm
         link-citations: true
         keep-tex: true
         pdf-engine: lualatex
+        pdf-engine-opt: -interaction=nonstopmode
 execute:
     cache: true
-    echo: false
+    # echo: false
 bibliography: extra/references.bib
 csl: extra/apa7-numeric-superscript-brackets-nocommas.csl
 # nocite: |
 #     @*
 ---
 
-## 1. Research Question, Societal & Scientific Relevance
+# Research Question & Relevance
 
-**Research Question:** How do bots influence discussions and information sharing within Reddit communities (subreddits)?
+**Research Question:** Can basic heuristic methods effectively identify bot influence on Reddit discussions?
 
 **Hypotheses:**
 
--   Bots amplify specific narratives.
--   Bots contribute to polarization/echo chambers.
+-   Account activity heuristics can identify probable bot accounts.
+-   These accounts may amplify specific narratives or contribute to online polarization.
 
-**Relevance:**
+**Relevance:** This study is a preliminary investigation into using simple methods for detecting and analyzing potential bot activity on Reddit. The findings will inform the need for more sophisticated methods to understand bots' broader impact on online discourse.
 
--   **Societal Relevance:** This research is relevant for combating misinformation, maintaining healthy online communities, and understanding public discourse manipulation. As social media platforms become increasingly influential in shaping public opinion, it is crucial to understand the role of automated accounts in these spaces. Bots can be used to spread propaganda, manipulate trends, and create an illusion of consensus, potentially leading to harmful real-world consequences.
--   **Scientific Relevance:** This study contributes to the understanding of online social influence, bot detection, and information diffusion on Reddit. It can help refine existing bot detection methods and provide insights into how information, particularly misinformation, spreads within online communities. The findings can inform the development of strategies to mitigate the negative impacts of bots on online discourse.
+# Data & Measurement
 
-## 2. Data & Measurement & Planned Analyses
+## Data
 
-### Data
+-   **Source:** Reddit API via the Python Reddit API Wrapper (PRAW).
+-   **Subreddits:** Selected for high subscriber counts and relevance to bot-targeted topics (e.g., politics, news). Keywords for selection will be generated using a reproducible method with Google Gemini (see Appendix for prompt and code). Subreddits will be scored as detailed in the appendix.
+-   **Collection:** Posts, comments, timestamps, and available user data like account age and karma.
 
--   **Source:** Reddit API (using the Python Reddit API Wrapper, PRAW)
--   **Subreddits:** Selection based on a scoring system that considers both the number of subscribers and the presence of keywords associated with topics likely to be targeted by bots (e.g., politics, elections, news, war, vaccines, conspiracy, finance, etc.). The list of keywords can be generated with the help of a large language model (e.g. Gemini) tuned for reproducibility (stochastic parameters such as Temperature turned to 0) and includes:
+## Measurement
+
+-   **Bot Identification (Heuristics):** Accounts flagged as potential bots if they exhibit:
+    -   Young account age.
+    -   Unusually low/high karma.
+    -   High posting frequency.
+    -   Repetitive content.
+-   **Analysis:**
+    -   **Descriptive:** Estimate bot prevalence, compare content from suspected bots versus humans, and analyze bot engagement patterns.
+    -   **Inferential:** Explore correlations between bot activity and narrative amplification (via keyword analysis) or polarization (via sentiment analysis).
+    -   **Accuracy Evaluation:** If feasible, build classification models and assess using cross-validation. Test various heuristic combinations, evaluating their performance with standard classification metrics.
+
+# Methodology: Challenges, Evaluation, and Scope
+
+## Population & Sample
+
+-   **Population:** Reddit users, especially in subreddits related to topics often targeted by bots.
+-   **Sample:** Data from selected subreddits as outlined in the "Data" section.
+
+## Challenges & Limitations
+
+Identifying Reddit bots is difficult because of user anonymity, as well as limited API access for data collection, and the inherent inaccuracy of heuristic detection methods. This study prioritizes a feasible approach, rigorously evaluating the accuracy of heuristics while transparently addressing all limitations. Ethical issues are also considered: only publicly available data will be used, and usernames will be anonymized to protect user privacy. The methodology, including limitations of bot identification, will be documented transparently.
+
+## Key Variable Measurement
+
+-   **Bot Activity:** Identified using heuristics such as account age, karma, and posting behavior.
+-   **Narrative Amplification:** Measured by frequency of keywords linked to specific narratives.
+-   **Polarization:** Assessed using sentiment analysis on discussion content.
+
+## Evaluation of Bot Detection
+
+The effectiveness of the heuristics will be thoroughly evaluated, including testing different combinations. We will explore leveraging Large Language Models to refine detection. If feasible, simple classification models will be developed and their performance assessed using standard accuracy metrics, offering a quantitative evaluation of the bot detection's effectiveness.
+
+## Expected Outcomes
+
+This research aims to establish the feasibility of using basic heuristics for bot detection on Reddit and provide preliminary insights into their potential influence on discussions, particularly regarding narrative amplification and polarization. The primary limitations will be the accuracy of the heuristics and the generalizability of the results to all of Reddit.
+
+\newpage
+
+# Appendix
+
+## Keyword Generation
+
+The list of keywords can be generated with the help of a large language model API (e.g. Gemini) tuned for reproducibility (stochastic parameters such as Temperature turned to 0) and includes:
 
 ```{python}
 import google.generativeai as genai
@@ -49,22 +104,31 @@ genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
 # Create the model
 generation_config = {
-  "temperature": 0, # controls randomness. 0 = most deterministic (always selects highest probability token).
-  "top_p": 0, # nucleus sampling: limits token selection to the most probable. 0 = most deterministic (used when temperature > 0).
-  "top_k": 1, # restricts to top 'k' tokens. 1 = most deterministic (used when temperature > 0).
+  "temperature": 0,
+  # controls randomness.
+  # 0 = most deterministic
+  # (always selects highest probability token).
+  "top_p": 0,
+  # nucleus sampling:
+  # limits token selection to the most probable.
+  # 0 = most deterministic (used when temperature > 0).
+  "top_k": 1,
+  # restricts to top 'k' tokens.
+  # 1 = most deterministic (used when temperature > 0).
   "max_output_tokens": 8192,
   "response_mime_type": "text/plain",
 }
 
 model = genai.GenerativeModel(
   model_name="gemini-exp-1206",
+  # best performing gemini model (see: https://livebench.ai)
+  # api usage is basically unlimited and free of charge
   generation_config=generation_config,
 )
 
 import praw
 import pandas as pd
 
-# Replace with your actual credentials
 reddit = praw.Reddit(
     client_id=os.environ["PRAW_CLIENT_ID"],
     client_secret=os.environ["PRAW_CLIENT_SECRET"],
@@ -73,32 +137,35 @@ reddit = praw.Reddit(
     password=os.environ["PRAW_PASSWORD"],
 )
 
-# Fetch a large subset of popular subreddits (large limit makes this representative of the largest overall subreddits by subscribers, check: https://gummysearch.com/tools/top-subreddits/)
+# Fetch a large subset of popular subreddits
+# (large limit makes this representative of
+# the largest overall subreddits by subscribers,
+# check: https://gummysearch.com/tools/top-subreddits/)
 subreddits = list(reddit.subreddits.popular(limit=1000))
 
-# Create a DataFrame using list comprehension for better performance
+# Create a DataFrame containing generated subs list
 subs_df = pd.DataFrame([{
     "Name": subreddit.display_name,
     "Subscribers": subreddit.subscribers,
     "Description": subreddit.public_description,
     "Over 18": subreddit.over18,
     "Submission Type": subreddit.submission_type
-} for subreddit in subreddits]).sort_values(by="Subscribers", ascending=False, ignore_index=True)
-
-# Print the top 10
-# subs_df.head(10)
+} for subreddit in subreddits]).sort_values(
+    by="Subscribers", ascending=False, ignore_index=True)
 
 import ast
 
 chat_session = model.start_chat()
 
-response = chat_session.send_message("What are some keywords i can use to create a list of subreddits which are likely to be influenced by bots? For example: \"news\", \"politics\", \"war\", \"vaccines\", etc.\n\nKeep the answer short, only including about 20 keywords and saving them in a python list as follows [\"key1\",\"key2\",...]. Send the output as text not as code.")
+response = chat_session.send_message("What are some keywords I can use to create a list of subreddits which are likely to be influenced by bots because of their controversial nature? These are keywords that I would look for within a subreddit's name or description. For example: \"news\", \"politics\", \"discussion\", \"war\", \"vaccines\", \"controversial\", \"conflict\", etc.\n\nKeep the answer short, only including 50 keywords and saving them in a python list as follows [\"key1\",\"key2\",...]. Send the output as text not as code.")
 
 bot_influence_keywords = ast.literal_eval(response.candidates[0].content.parts[0].text.replace("\n", ""))
 
 for i in range(0, len(bot_influence_keywords), 5):
     print(*bot_influence_keywords[i:i+5])
 ```
+
+## Selected Subreddits
 
 The top 10 subreddits based on this scoring system are:
 
@@ -109,11 +176,11 @@ def calculate_bot_influence_score(row):
     
     # Large subscriber base increases potential for bot activity
     if row['Subscribers'] > 10000000:
-        score += 3
+        score += 5
     elif row['Subscribers'] > 5000000:
-        score += 2
+        score += 4
     elif row['Subscribers'] > 1000000:
-        score += 1
+        score += 3
         
     # Check for keywords in description and subreddit name
     description = row['Description'].lower()
@@ -121,102 +188,14 @@ def calculate_bot_influence_score(row):
     for keyword in bot_influence_keywords:
         if keyword in description:
             score += 1
-        elif keyword in sub_name:
+        if keyword in sub_name:
             score += 1
             
     return score
 
-# Filter for link/self submissions and calculate scores
-bot_vulnerable_subs = subs_df[
-    (subs_df['Submission Type'].isin(['link', 'self']))
-].copy()
-
-bot_vulnerable_subs['Bot Score'] = bot_vulnerable_subs.apply(calculate_bot_influence_score, axis=1)
+subs_df['Bot Score'] = subs_df.apply(calculate_bot_influence_score, axis=1)
 
 # Get top 10 most vulnerable subreddits
-top_vulnerable = bot_vulnerable_subs.nlargest(10, 'Bot Score')[['Name', 'Subscribers', 'Submission Type', 'Bot Score']]
+top_vulnerable = subs_df.nlargest(10, 'Bot Score')[['Name', 'Subscribers', 'Submission Type', 'Bot Score']].reset_index(drop=True)
 top_vulnerable
 ```
-
--   **Collection:** Data collected includes posts, comments, user data (if available), and timestamps.
-
-### Measurement
-
--   **Bot Identification:** A heuristic approach will be used to identify potential bots. This approach will consider factors such as account age, karma, post frequency, and repetitive content. For instance, accounts with very low karma, extremely high posting frequency, or those exhibiting highly repetitive posting patterns may be flagged as potential bots.
--   **Analysis:**
-    -   **Descriptive:** The prevalence of bots within the selected subreddits will be estimated. Content analysis will be performed to compare the content generated by suspected bots versus human users. Engagement patterns (e.g., upvotes, downvotes, comment frequency) of suspected bots will be analyzed.
-    -   **Inferential:** Correlation analysis will be conducted to examine the relationship between bot activity and various factors, such as the prevalence of specific narratives or the level of polarization within discussions.
-
-## 3. Challenges & Open Questions
-
-### Challenges
-
--   **Difficult Bot Detection on Reddit:** Reddit's relative anonymity and the limited availability of tools compared to other platforms make bot detection challenging.
--   **Creating a Reliable "Ground Truth" Dataset:**  There is no readily available "ground truth" dataset for bot detection on Reddit. This makes it difficult to train and evaluate bot detection models.
--   **Data Access Uncertainties:** The Reddit API has rate limits, which may affect the amount of data that can be collected within a given timeframe.
-
-### Discussion
-
-The chosen methods and data have limitations. The heuristic approach to bot detection is not perfect and may result in misclassification. The reliance on the Reddit API introduces potential biases, as the API may not provide a completely representative sample of Reddit activity.
-
-The findings of this study could have implications for Reddit and platform policies. If a significant presence of bots is found to be influencing discussions, Reddit may need to implement stricter measures to detect and remove bots. The findings could also inform broader discussions about platform governance and the responsibility of social media companies in mitigating the spread of misinformation.
-
-### Open Questions
-
--   How can bot detection on Reddit be improved, given the platform's unique characteristics?
--   What are the most effective strategies to counter the influence of bots on Reddit and other online platforms?
-
-## 4. Population (Target)
-
-The target population is users of the social media platform Reddit, specifically those participating in subreddits related to topics often targeted by bots, such as news, politics, and finance. This includes both human users and automated accounts (bots).
-
-## 5. Sample
-
-The sample consists of data collected from the top 10 subreddits identified as most vulnerable to bot influence, based on the scoring system described in the "Data" section. These subreddits are selected based on their large subscriber base and the presence of keywords related to bot-targeted topics in their descriptions.
-
-## 6. Unit
-
-The fundamental units of analysis are individual posts and comments within the selected subreddits. The analysis will consider both individual users (or suspected bots) as well as aggregate patterns within each subreddit.
-
-## 7. Data/Observations
-
-The data collected includes posts and comments from the selected subreddits, along with associated metadata such as timestamps, user information (where available), and engagement metrics (upvotes, downvotes). The data is structured as a combination of cross-sectional (snapshot of activity at a given time) and panel data (tracking posts and comments over time). For example, a post's initial reception can be captured (cross-sectional), while changes in engagement over time can also be tracked (panel).
-
-## 8. Measurement
-
-The different variables are measured as follows:
-
--   **Bot Activity:** Measured through a heuristic approach based on user account data and posting behavior.
--   **Narrative Amplification:** Measured by analyzing the frequency and prominence of specific keywords and phrases in posts and comments.
--   **Polarization/Echo Chambers:** Measured by analyzing the sentiment and language used in discussions, as well as the network structure of interactions between users (e.g., identifying clusters of users who primarily interact with each other).
-
-## 9. Machine Learning Method
-
-While the primary focus is not on building a machine learning model, descriptive and inferential analysis will be conducted. These could include:
-
--   **Descriptive Statistics:** Calculating the prevalence of suspected bots, analyzing the distribution of post and comment lengths, and examining engagement patterns.
--   **Correlation Analysis:** Investigating the relationship between bot activity and other variables, such as the frequency of specific narratives or the level of polarization.
-
-## 10. ML Model & Unit of Analysis & Estimation
-
-As the main analysis is not focused on machine learning, this section is not applicable.
-
-## 11. Theory/Mechanisms
-
-The underlying theory is that bots can be used to manipulate online discussions by amplifying specific narratives, creating echo chambers, and influencing public opinion. This is achieved through various mechanisms, such as:
-
--   **Agenda Setting:** Bots can artificially inflate the visibility of certain topics by posting frequently and generating engagement (e.g., upvotes, comments).
--   **Framing:** Bots can promote specific interpretations of events or issues by using particular language and framing techniques.
--   **Social Proof:** Bots can create the illusion of consensus or popularity by mimicking human behavior and interacting with other users.
-
-## 12. Training/Testing
-
-Not applicable as the main focus is not on building a machine learning model.
-
-## 13. Assessment of Accuracy
-
-Not applicable.
-
-## 14. Previous Studies
-
-Previous research on bot detection and influence on social media will be reviewed. This includes studies on platforms like Twitter and Facebook, as well as research on Reddit. The literature review will focus on identifying different bot detection methods, analyzing the impact of bots on online discussions, and understanding the mechanisms through which bots exert influence. This will help inform the current study's methodology and provide a context for interpreting the findings.
