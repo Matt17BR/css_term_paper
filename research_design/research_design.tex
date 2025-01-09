@@ -42,7 +42,7 @@
 \usepackage{xcolor}
 \usepackage[top=1.5cm,bottom=3cm,hmargin=2.5cm]{geometry}
 \setlength{\emergencystretch}{3em} % prevent overfull lines
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\setcounter{secnumdepth}{5}
 % Make \paragraph and \subparagraph free-standing
 \makeatletter
 \ifx\paragraph\undefined\else
@@ -208,7 +208,7 @@
 \subtitle{Detecting Bots on Reddit\\
 Computational Social Science}
 \author{Matteo Mazzarelli}
-\date{January 27, 2025}
+\date{January 9, 2025}
 
 \begin{document}
 \maketitle
@@ -236,7 +236,7 @@ simple methods for detecting and analyzing potential bot activity on
 Reddit. The findings will inform the need for more sophisticated methods
 to understand bots' broader impact on online discourse.
 
-\section{Data \& Measurement}\label{data-measurement}
+\section{Data \& Measurement}\label{sec-data}
 
 \subsection{Data}\label{data}
 
@@ -248,8 +248,8 @@ to understand bots' broader impact on online discourse.
   \textbf{Subreddits:} Selected for high subscriber counts and relevance
   to bot-targeted topics (e.g., politics, news). Keywords for selection
   will be generated using a reproducible method with Google Gemini (see
-  Appendix for prompt and code). Subreddits will be scored as detailed
-  in the appendix.
+  Section~\ref{sec-keywords} for prompt and code). Subreddits will be
+  scored as detailed in Section~\ref{sec-subreddits}.
 \item
   \textbf{Collection:} Posts, comments, timestamps, and available user
   data like account age and karma.
@@ -305,8 +305,8 @@ Scope}\label{methodology-challenges-evaluation-and-scope}
   \textbf{Population:} Reddit users, especially in subreddits related to
   topics often targeted by bots.
 \item
-  \textbf{Sample:} Data from selected subreddits as outlined in the
-  ``Data'' section.
+  \textbf{Sample:} Data from selected subreddits as outlined in
+  Section~\ref{sec-data}.
 \end{itemize}
 
 \subsection{Challenges \& Limitations}\label{challenges-limitations}
@@ -356,9 +356,11 @@ results to all of Reddit.
 
 \newpage
 
+\appendix
+
 \section{Appendix}\label{appendix}
 
-\subsection{Keyword Generation}\label{keyword-generation}
+\subsection{Keyword Generation}\label{sec-keywords}
 
 The list of keywords can be generated with the help of a large language
 model API (e.g.~Gemini) tuned for reproducibility (stochastic parameters
@@ -448,7 +450,7 @@ anarchy global national security privacy
 surveillance technology science health
 \end{verbatim}
 
-\subsection{Selected Subreddits}\label{selected-subreddits}
+\subsection{Selected Subreddits}\label{sec-subreddits}
 
 The top 10 subreddits based on this scoring system are:
 

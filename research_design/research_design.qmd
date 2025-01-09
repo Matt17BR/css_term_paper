@@ -1,37 +1,3 @@
----
-title: Research Design Outline
-subtitle: |
-    Detecting Bots on Reddit \
-    Computational Social Science
-author: Matteo Mazzarelli
-date: 01/27/2025
-date-format: long
-format:
-    pdf:
-        include-in-header: 
-            text: |
-                \usepackage{fvextra}
-                \DefineVerbatimEnvironment{Highlighting}{Verbatim}{
-                    commandchars=\\\{\},
-                    breaklines, breaknonspaceingroup, breakanywhere
-                }
-        geometry:
-            - top=1.5cm
-            - bottom=3cm
-            - hmargin=2.5cm
-        link-citations: true
-        keep-tex: true
-        pdf-engine: lualatex
-        pdf-engine-opt: -interaction=nonstopmode
-execute:
-    cache: true
-    # echo: false
-bibliography: extra/references.bib
-csl: extra/apa7-numeric-superscript-brackets-nocommas.csl
-# nocite: |
-#     @*
----
-
 # Research Question & Relevance
 
 **Research Question:** Can basic heuristic methods effectively identify bot influence on Reddit discussions?
@@ -43,12 +9,12 @@ csl: extra/apa7-numeric-superscript-brackets-nocommas.csl
 
 **Relevance:** This study is a preliminary investigation into using simple methods for detecting and analyzing potential bot activity on Reddit. The findings will inform the need for more sophisticated methods to understand bots' broader impact on online discourse.
 
-# Data & Measurement
+# Data & Measurement {#sec-data}
 
 ## Data
 
 -   **Source:** Reddit API via the Python Reddit API Wrapper (PRAW).
--   **Subreddits:** Selected for high subscriber counts and relevance to bot-targeted topics (e.g., politics, news). Keywords for selection will be generated using a reproducible method with Google Gemini (see Appendix for prompt and code). Subreddits will be scored as detailed in the appendix.
+-   **Subreddits:** Selected for high subscriber counts and relevance to bot-targeted topics (e.g., politics, news). Keywords for selection will be generated using a reproducible method with Google Gemini (see @sec-keywords for prompt and code). Subreddits will be scored as detailed in @sec-subreddits.
 -   **Collection:** Posts, comments, timestamps, and available user data like account age and karma.
 
 ## Measurement
@@ -68,7 +34,7 @@ csl: extra/apa7-numeric-superscript-brackets-nocommas.csl
 ## Population & Sample
 
 -   **Population:** Reddit users, especially in subreddits related to topics often targeted by bots.
--   **Sample:** Data from selected subreddits as outlined in the "Data" section.
+-   **Sample:** Data from selected subreddits as outlined in @sec-data.
 
 ## Challenges & Limitations
 
@@ -90,9 +56,11 @@ This research aims to establish the feasibility of using basic heuristics for bo
 
 \newpage
 
-# Appendix
+\appendix
 
-## Keyword Generation
+# Appendix {.appendix}
+
+## Keyword Generation {#sec-keywords}
 
 The list of keywords can be generated with the help of a large language model API (e.g. Gemini) tuned for reproducibility (stochastic parameters such as Temperature turned to 0) and includes:
 
@@ -165,7 +133,7 @@ for i in range(0, len(bot_influence_keywords), 5):
     print(*bot_influence_keywords[i:i+5])
 ```
 
-## Selected Subreddits
+## Selected Subreddits {#sec-subreddits}
 
 The top 10 subreddits based on this scoring system are:
 

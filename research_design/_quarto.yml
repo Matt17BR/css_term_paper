@@ -1,3 +1,35 @@
 project:
-  title: "Research Design Outline"
-  output-dir: docs
+    title: Research Design Outline
+    output-dir: docs
+title: Research Design Outline
+subtitle: |
+    Detecting Bots on Reddit \
+    Computational Social Science
+author: Matteo Mazzarelli
+date: today
+date-format: long
+format:
+    pdf:
+        number-sections: true
+        include-in-header: 
+            text: |
+                \usepackage{fvextra}
+                \DefineVerbatimEnvironment{Highlighting}{Verbatim}{
+                    commandchars=\\\{\},
+                    breaklines, breaknonspaceingroup, breakanywhere
+                }
+        geometry:
+            - top=1.5cm
+            - bottom=3cm
+            - hmargin=2.5cm
+        link-citations: true
+        keep-tex: true
+        pdf-engine: latexmk
+        # pdf-engine-opt: -interaction=nonstopmode
+execute:
+    cache: true
+    # echo: false
+bibliography: extra/references.bib
+csl: extra/apa7-numeric-superscript-brackets-nocommas.csl
+# nocite: |
+#     @*
