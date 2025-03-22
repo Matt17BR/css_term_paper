@@ -3,3 +3,6 @@ extra/Presentations_ideas.pdf
 extra/Syllabus_CSS_2024_2025.pdf
 extra/Guidelines - Research design.pdf
 research_design/research_design.fdb_latexmk
+.env
+google_deep_research_output.md
+datasets/

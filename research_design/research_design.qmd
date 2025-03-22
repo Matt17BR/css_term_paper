@@ -56,8 +56,6 @@ This research aims to establish the feasibility of using basic heuristics for bo
 
 \newpage
 
-\appendix
-
 # Appendix {.appendix}
 
 ## Keyword Generation {#sec-keywords}
