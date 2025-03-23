@@ -18,17 +18,17 @@ format:
             - hmargin=2.5cm
         link-citations: true
         keep-tex: true
-        pdf-engine: latexmk
-        pdf-engine-opts: 
-            - "-lualatex"
-            - "-f"
-            - "-gg"
-            # - "-interaction=nonstopmode"
+        # pdf-engine: latexmk
+        # pdf-engine-opts: 
+        #     - "-lualatex"
+        #     - "-f"
+        #     - "-gg"
+        #     # - "-interaction=nonstopmode"
 execute:
     cache: true
     # echo: false
     warning: false
 bibliography: extra/references.bib
 csl: extra/apa7-numeric-superscript-brackets-nocommas.csl
-# nocite: |
-#     @*
+nocite: |
+    @*

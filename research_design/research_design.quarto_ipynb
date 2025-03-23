@@ -68,7 +68,7 @@
         "\n",
         "The list of keywords can be generated with the help of a large language model API (e.g. Gemini) tuned for reproducibility (stochastic parameters such as Temperature turned to 0) and includes:\n"
       ],
-      "id": "845a4ddc"
+      "id": "eac47da6"
     },
     {
       "cell_type": "code",
@@ -141,7 +141,7 @@
         "for i in range(0, len(bot_influence_keywords), 5):\n",
         "    print(*bot_influence_keywords[i:i+5])"
       ],
-      "id": "fd0f8f35",
+      "id": "cc5a2ca8",
       "execution_count": null,
       "outputs": []
     },
@@ -153,7 +153,7 @@
         "\n",
         "The top 10 subreddits based on this scoring system are:\n"
       ],
-      "id": "7e6f5fb5"
+      "id": "e4dba284"
     },
     {
       "cell_type": "code",
@@ -188,7 +188,7 @@
         "top_vulnerable = subs_df.nlargest(10, 'Bot Score')[['Name', 'Subscribers', 'Submission Type', 'Bot Score']].reset_index(drop=True)\n",
         "top_vulnerable"
       ],
-      "id": "773d8bb8",
+      "id": "c69d9a9c",
       "execution_count": null,
       "outputs": []
     }
