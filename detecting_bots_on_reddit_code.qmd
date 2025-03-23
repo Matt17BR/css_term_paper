@@ -1,0 +1,1677 @@
+```{python}
+#| echo: false
+import pandas as pd
+
+pd.set_option('display.max_columns', 4)  # Limit to 4 columns displayed
+
+def glimpse(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Similar to R's glimpse()
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+
+    Returns
+    -------
+    pd.DataFrame
+    """
+    print(f"Rows: {df.shape[0]}")
+    print(f"Columns: {df.shape[1]}")
+
+    sample_size = min(df.shape[0], 5)
+
+    return (
+        df.sample(sample_size)
+        .T.assign(dtypes=df.dtypes)
+        .loc[
+            :, lambda x: sorted(x.columns, key=lambda col: 0 if col == "dtypes" else 1)
+        ]
+    )
+```
+
+```{python}
+import base64
+import os
+from dotenv import load_dotenv 
+from google import genai
+from google.genai import types
+
+load_dotenv()
+
+# set up LLM parameters
+def generate(prompt):
+    client = genai.Client(
+        api_key=os.getenv("GEMINI_API_KEY"),
+    )
+
+    model = "gemini-2.0-flash" # fastest model (used as default on the Gemini web app)
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text=prompt),
+            ],
+        ),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        temperature=0, # controls randomness. 0 = most deterministic (always selects highest probability token)
+        top_p=0, # nucleus sampling: limits token selection to the most probable. 0 = most deterministic (used when temperature > 0)
+        top_k=1, # restricts to top 'k' tokens. 1 = most deterministic (used when temperature > 0)
+        max_output_tokens=8192,
+        response_mime_type="text/plain",
+    )
+
+    complete_response = ""
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        complete_response += chunk.text
+
+    return complete_response
+```
+
+```{python}
+import praw
+import pandas as pd
+
+# Replace with your actual credentials
+reddit = praw.Reddit(
+    client_id=os.getenv("PRAW_CLIENT_ID"),
+    client_secret=os.getenv("PRAW_CLIENT_SECRET"),
+    user_agent=os.getenv("PRAW_USER_AGENT"),
+    username=os.getenv("PRAW_USERNAME"),
+    password=os.getenv("PRAW_PASSWORD")
+)
+
+# Fetch a large subset of popular subreddits (large limit makes this representative of the largest overall subreddits by subscribers, check: https://gummysearch.com/tools/top-subreddits/)
+subreddits = list(reddit.subreddits.popular(limit=1000))
+
+# Create a DataFrame using list comprehension for better performance
+subs_df = pd.DataFrame([{
+    "Name": subreddit.display_name,
+    "Subscribers": subreddit.subscribers,
+    "Description": subreddit.public_description,
+    "Over 18": subreddit.over18,
+    "Submission Type": subreddit.submission_type
+} for subreddit in subreddits]).sort_values(by="Subscribers", ascending=False, ignore_index=True)
+
+# Print the top 10
+subs_df.head(10)
+```
+
+
+```{python}
+import ast
+
+response = generate("What are some keywords I can use to create a list of subreddits which are likely to be influenced by bots because of their controversial nature? These are keywords that I would look for within a subreddit's name or description. For example: \"news\", \"politics\", \"discussion\", \"war\", \"vaccines\", \"controversial\", \"conflict\", etc.\n\nKeep the answer short, only including 50 keywords and saving them in a python list as follows [\"key1\",\"key2\",...]. Send the output as text not as code.")
+
+bot_influence_keywords = ast.literal_eval(response.replace("\n", ""))
+
+for i in range(0, len(bot_influence_keywords), 5):
+    print(*bot_influence_keywords[i:i+5])
+```
+
+
+```{python}
+# Score subreddits based on subscribers and keywords in description
+def calculate_bot_influence_score(row):
+    score = 0
+    
+    # Large subscriber base increases potential for bot activity
+    if row['Subscribers'] > 10000000:
+        score += 5
+    elif row['Subscribers'] > 5000000:
+        score += 4
+    elif row['Subscribers'] > 1000000:
+        score += 3
+        
+    # Check for keywords in description and subreddit name
+    description = row['Description'].lower()
+    sub_name = row['Name'].lower()
+    for keyword in bot_influence_keywords:
+        if keyword in description:
+            score += 1
+        if keyword in sub_name:
+            score += 1
+            
+    return score
+
+subs_df['Bot Score'] = subs_df.apply(calculate_bot_influence_score, axis=1)
+
+# Get top 50 most vulnerable subreddits
+top_vulnerable = subs_df.nlargest(50, 'Bot Score')[['Name', 'Subscribers', 'Submission Type', 'Bot Score']].reset_index(drop=True)
+top_vulnerable.head(10)
+```
+
+
+```{python}
+#| output: false
+# Filter the DataFrame to include only the desired subreddits
+subreddits_of_interest = ['worldnews', 'news', 'politics', 'science', 'technology']
+top_vulnerable_filtered = top_vulnerable[top_vulnerable['Name'].isin(subreddits_of_interest)].reset_index(drop=True)
+
+top_vulnerable_filtered
+```
+
+
+```{python}
+#| eval: false
+import time
+import concurrent.futures
+
+# Function to Fetch Posts and Comments
+def fetch_posts_and_comments(subreddit_name, num_posts=50, num_comments=2000):
+    """
+    Fetches posts and their comments from a subreddit, including comment levels and parent comment ID.
+
+    Args:
+        subreddit_name: The name of the subreddit.
+        num_posts: The maximum number of posts to fetch.
+        num_comments: The maximum number of comments to fetch per post (total, across all levels).
+
+    Returns:
+        A list of dictionaries, where each dictionary represents a post and its comments,
+        with each comment including its level and parent comment ID.
+    """
+    subreddit = reddit.subreddit(subreddit_name)
+    posts_data = []
+
+    try:
+        for post in subreddit.hot(limit=num_posts):  # You can change 'hot' to 'new', 'rising', etc.
+            post_data = {
+                "subreddit": subreddit_name,
+                "post_id": post.id,
+                "post_title": post.title,
+                "post_author": str(post.author),
+                "post_score": post.score,
+                "post_upvote_ratio": post.upvote_ratio,
+                "post_url": post.url,
+                "post_selftext": post.selftext,
+                "post_created_utc": post.created_utc,
+                "comments": []
+            }
+
+            def fetch_comments_recursive(comments, level=1, comment_count=0, parent_id=None):
+                comment_data = []
+                for comment in comments:
+                    if comment_count >= num_comments:
+                        break  # Stop fetching comments if the limit is reached
+
+                    comment_data.append({
+                        "comment_id": comment.id,
+                        "comment_author": str(comment.author),
+                        "comment_body": comment.body,
+                        "comment_score": comment.score,
+                        "comment_created_utc": comment.created_utc,
+                        "comment_level": level,  # Add the comment level
+                        "parent_id": parent_id  # Add the parent comment ID
+                    })
+                    comment_count += 1
+
+                    # Fetch replies recursively
+                    if hasattr(comment, 'replies'):
+                        comment.replies.replace_more(limit=0)  # Ensure all 'MoreComments' are resolved
+                        replies_data, comment_count = fetch_comments_recursive(comment.replies, level + 1, comment_count, comment.id)
+                        comment_data.extend(replies_data)
+
+                return comment_data, comment_count
+
+            post.comments.replace_more(limit=0)  # Ensure all top-level 'MoreComments' are resolved
+            comments_data, _ = fetch_comments_recursive(post.comments)
+            post_data["comments"] = comments_data
+
+            posts_data.append(post_data)
+
+            # Respect API rate limits
+            # time.sleep(1)
+
+    except Exception as e:
+        print(f"Error fetching data from r/{subreddit_name}: {e}")
+
+    return posts_data
+
+# Main Data Collection Loop
+all_data = []
+subreddit_names = top_vulnerable_filtered['Name'].tolist()
+num_cores = os.cpu_count()  # Get the number of CPU cores
+
+with concurrent.futures.ThreadPoolExecutor(max_workers=num_cores) as executor:
+    # Submit tasks to the executor
+    futures = [executor.submit(fetch_posts_and_comments, subreddit_name, num_posts=50, num_comments=50) for subreddit_name in subreddit_names]
+
+    # Wait for all tasks to complete and collect results
+    for future in concurrent.futures.as_completed(futures):
+        try:
+            subreddit_data = future.result()
+            all_data.extend(subreddit_data)
+        except Exception as e:
+            print(f"Error fetching data: {e}")
+
+# Convert to DataFrame
+reddit_data_df = pd.DataFrame(all_data)
+
+# Convert lists of comments to a separate DataFrame if desired
+comments_data = []
+for index, row in reddit_data_df.iterrows():
+    for comment in row['comments']:
+        comment['post_id'] = row['post_id'] # add the relationship
+        comments_data.append(comment)
+comments_df = pd.DataFrame(comments_data)
+# Expand the comments into its own columns
+# reddit_data_df = pd.concat([reddit_data_df.drop(['comments'], axis=1), pd.DataFrame(reddit_data_df['comments'].tolist()).add_prefix('comment_')], axis=1)
+
+# Export to CSV
+reddit_data_df.to_csv("reddit_posts_and_comments.csv", index=False)
+comments_df.to_csv("comments.csv", index=False)
+```
+
+
+```{python}
+import pandas as pd
+
+reddit_data_df = pd.read_csv("workspaces/reddit_posts_and_comments_03-21-1950.csv")
+
+reddit_data_df.head(10)
+```
+
+
+```{python}
+comments_df = pd.read_csv("workspaces/comments_03-21-1950.csv")
+comments_df = comments_df.dropna(subset=['comment_author'])  # Drop rows with missing author names (removed posts)
+
+comments_df.head(10)
+```
+
+
+```{python}
+import numpy as np
+
+# Merge reddit_data_df with comments_df
+comments_df = comments_df.merge(reddit_data_df[['post_id', 'post_author', 'subreddit', 'post_created_utc']], on='post_id', how='left')
+
+# Convert UTC timestamps to datetime objects and add a new column for the time taken to comment on a post
+comments_df['comment_created_utc'] = pd.to_datetime(comments_df['comment_created_utc'], unit='s')
+comments_df['post_created_utc'] = pd.to_datetime(comments_df['post_created_utc'], unit='s')
+
+comments_df['post_to_comment_time'] = comments_df['comment_created_utc'] - comments_df['post_created_utc']
+
+import numpy as np
+
+# Calculate comment length
+comments_df['comment_length'] = comments_df['comment_body'].str.len()
+
+# Calculate the ratio of comment length to post-to-comment time.  Convert the timedelta to seconds.
+comments_df['comment_speed_from_post'] = comments_df['comment_length'] / comments_df['post_to_comment_time'].dt.total_seconds()
+# Calculate the time difference between a comment and its parent comment.
+
+# First, we need to merge comments_df with itself to get the creation time of the parent comment.
+comments_df = comments_df.merge(comments_df[['comment_id', 'comment_created_utc']], left_on='parent_id', right_on='comment_id', suffixes=('', '_parent'), how='left')
+
+# Calculate the time difference.  If parent_id is NaN, then the time difference will be NaN
+comments_df['comment_to_parent_time'] = comments_df['comment_created_utc'] - comments_df['comment_created_utc_parent']
+
+# Calculate comment speed from parent. Convert the timedelta to seconds.
+comments_df['comment_speed_from_parent'] = comments_df['comment_length'] / comments_df['comment_to_parent_time'].dt.total_seconds()
+# Identify comments made by the original poster (OP)
+comments_df['is_op'] = np.where(comments_df['post_author'] == comments_df['comment_author'], True, False)
+
+comments_df.head(10)
+```
+
+
+```{python}
+#| eval: false
+import praw
+import os
+from datetime import datetime
+import pandas as pd
+
+reddit = praw.Reddit(
+    client_id=os.getenv("PRAW_CLIENT_ID"),
+    client_secret=os.getenv("PRAW_CLIENT_SECRET"),
+    user_agent=os.getenv("PRAW_USER_AGENT"),
+    username=os.getenv("PRAW_USERNAME"),
+    password=os.getenv("PRAW_PASSWORD")
+)
+
+unique_users = comments_df['comment_author'].unique().tolist()
+
+user_metrics_cache = {}  # Dictionary to store user metrics
+
+def get_user_metrics(author_name):
+    """
+    Fetches account age and karma for a given Reddit username.
+    Uses a cache to avoid repeated API calls for the same user.
+
+    Args:
+        author_name (str): The Reddit username.
+
+    Returns:
+        tuple: A tuple containing account age in days and karma score.
+               Returns (None, None) if there's an error.
+    """
+    if author_name in user_metrics_cache:
+        return user_metrics_cache[author_name]
+
+    try:
+        user = reddit.redditor(author_name)
+
+        # Account Age
+        account_creation_time = datetime.fromtimestamp(user.created_utc)
+        age_in_days = (datetime.now() - account_creation_time).days
+
+        # Karma
+        karma = user.comment_karma + user.link_karma
+
+        user_metrics_cache[author_name] = (age_in_days, karma)  # Store in cache
+        return age_in_days, karma
+
+    except praw.exceptions.APIException as e:
+        print(f"Error fetching metrics for {author_name}: {e}")
+        return None, None
+    except Exception as e:
+        print(f"Error fetching metrics for {author_name}: {e}")
+        return None, None
+
+user_data = {}
+for i, user in enumerate(unique_users):
+    age, karma = get_user_metrics(user)
+    user_data[user] = {'account_age_days': age, 'karma': karma}
+
+    if (i + 1) % 1000 == 0:
+        print(f"Processed {i + 1}/{len(unique_users)} users")
+
+# Map the user data back to the comments_df
+comments_df['account_age_days'] = comments_df['comment_author'].map(lambda x: user_data[x]['account_age_days'])
+comments_df['karma'] = comments_df['comment_author'].map(lambda x: user_data[x]['karma'])
+
+# Identify users with missing account age or karma
+missing_users = comments_df[comments_df['account_age_days'].isnull()]['comment_author'].tolist()
+
+print(f"Number of rows with missing data: {len(missing_users)}")
+
+# Retry fetching metrics for missing users
+if missing_users:
+    print("Retrying fetching metrics for missing users...")
+    for user in missing_users:
+        age, karma = get_user_metrics(user)
+        
+        # Update the user_data dictionary and DataFrame
+        user_data[user] = {'account_age_days': age, 'karma': karma}
+        comments_df.loc[comments_df['comment_author'] == user, 'account_age_days'] = age
+        comments_df.loc[comments_df['comment_author'] == user, 'karma'] = karma
+        
+        if age is not None and karma is not None:
+            print(f"Fetched data for user: {user} - Age: {age}, Karma: {karma}")
+
+    print("Finished retrying fetching metrics for missing users.")
+else:
+    print("No users with missing data.")
+
+# Verify that there are no more missing values
+print(f"Number of rows with missing data after retry: {comments_df['account_age_days'].isnull().sum()}")
+
+# Drop rows where 'account_age_days' or 'karma' is NaN
+comments_df = comments_df.dropna(subset=['account_age_days', 'karma'])
+
+comments_df.to_csv("processed_comments.csv", index=False)
+
+comments_df.head(10)
+```
+
+
+```{python}
+#| eval: false
+import time
+
+unique_authors = comments_df['comment_author'].unique()
+
+all_comments = []
+
+for i, author in enumerate(unique_authors):
+    retries = 3  # Number of retries
+    for attempt in range(retries):
+        try:
+            user = reddit.redditor(author)
+            comments = user.comments.new(limit=10)
+            for comment in comments:
+                comment_data = {
+                    'author': author,
+                    'comment_id': comment.id,
+                    'body': comment.body,
+                    'score': comment.score,
+                    'subreddit': comment.subreddit.display_name,
+                    'created_utc': comment.created_utc,
+                    'permalink': comment.permalink
+                }
+                all_comments.append(comment_data)
+            break  # If successful, break out of the retry loop
+        except Exception as e:
+            print(f"Could not retrieve comments for {author} (Attempt {attempt + 1}/{retries}): {e}")
+            if attempt < retries - 1:
+                time.sleep(10)  # Wait for 10 seconds before retrying
+            else:
+                print(f"Failed to retrieve comments for {author} after {retries} attempts.")
+    if (i + 1) % 1000 == 0:
+        print(f"Processed {i + 1}/{len(unique_authors)} authors")
+
+recent_user_comments = pd.DataFrame(all_comments)
+
+recent_user_comments['created_utc'] = pd.to_datetime(recent_user_comments['created_utc'], unit='s')
+
+recent_user_comments.to_csv("recent_user_comments.csv", index=False)
+
+recent_user_comments.head(10)
+```
+
+
+```{python}
+import pandas as pd
+
+processed_comments = pd.read_csv('workspaces/processed_comments.csv')
+
+processed_comments.head(10)
+```
+
+
+```{python}
+recent_user_comments = pd.read_csv('workspaces/recent_user_comments.csv')
+
+recent_user_comments.head(10)
+```
+
+
+```{python}
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+
+def calculate_comment_similarity(comments):
+    """
+    Calculates the average cosine similarity between comments for a given user.
+
+    Args:
+        comments (list): A list of comment bodies (strings).
+
+    Returns:
+        float: The average cosine similarity score.
+    """
+    if len(comments) < 2:
+        return 0.0  # Return 0 if there are fewer than 2 comments
+
+    vectorizer = TfidfVectorizer()
+    tfidf_matrix = vectorizer.fit_transform(comments)
+
+    # Calculate cosine similarity matrix
+    similarity_matrix = cosine_similarity(tfidf_matrix)
+
+    # Sum the upper triangle of the matrix (excluding the diagonal)
+    sum_of_similarities = np.sum(np.triu(similarity_matrix, k=1))
+
+    # Count the number of pairs (upper triangle elements)
+    num_pairs = len(comments) * (len(comments) - 1) / 2
+
+    if num_pairs == 0:
+        return 0.0
+
+    return sum_of_similarities / num_pairs
+
+def calculate_median_time_between_comments(timestamps):
+    """
+    Calculates the median time difference between consecutive comments for a given user.
+
+    Args:
+        timestamps (list): A list of comment creation timestamps (datetime objects).
+
+    Returns:
+        float: The median time difference in seconds.
+    """
+    if len(timestamps) < 2:
+        return np.nan  # Not enough comments to calculate median time
+
+    # Sort timestamps in ascending order
+    timestamps = sorted(timestamps)
+
+    # Convert timestamps to datetime objects
+    timestamps = pd.to_datetime(timestamps, unit='s')
+
+    # Calculate time differences between consecutive comments
+    time_diffs = [
+        (timestamps[i+1] - timestamps[i]).total_seconds()
+        for i in range(len(timestamps) - 1)
+    ]
+
+    return np.median(time_diffs)
+
+# Group comments by author
+grouped_comments = recent_user_comments.groupby('author')
+
+user_features = []
+
+for author, group in grouped_comments:
+    # Extract comment bodies and timestamps for the current author
+    comment_bodies = group['body'].tolist()
+    comment_times = group['created_utc'].tolist()
+
+    # Calculate comment similarity
+    content_similarity = calculate_comment_similarity(comment_bodies)
+
+    # Calculate median time between comments
+    median_time_between_comments = calculate_median_time_between_comments(comment_times)
+    
+    # Calculate average comment length
+    avg_comment_length = np.mean([len(comment) for comment in comment_bodies])
+
+    user_features.append({
+        'comment_author': author,
+        'content_cosine_similarity': content_similarity,
+        'median_secs_between_comments': median_time_between_comments,
+        'avg_comment_length_chars': avg_comment_length
+    })
+
+user_features_df = pd.DataFrame(user_features)
+
+user_features_df.head(10)
+```
+
+
+```{python}
+processed_comments = pd.merge(processed_comments, user_features_df, left_on='comment_author', right_on='comment_author', how='left')
+
+# Remove rows where any of the merged columns have missing values
+processed_comments = processed_comments.dropna(subset=['content_cosine_similarity', 'median_secs_between_comments', 'avg_comment_length_chars'])
+
+processed_comments.head(10)
+```
+
+
+```{python}
+ml_features = processed_comments[[
+    'comment_author', 'comment_body', 'comment_score', 'comment_level', 'subreddit', 'comment_length', 'comment_speed_from_post', 'comment_speed_from_parent', 'is_op', 'account_age_days', 'karma', 'content_cosine_similarity', 'median_secs_between_comments', 'avg_comment_length_chars'
+]].copy()
+
+ml_features.head(10)
+```
+
+
+```{python}
+import numpy as np
+
+# Replace infinite values in 'comment_speed_from_post' with a large number
+ml_features['comment_speed_from_post'] = ml_features['comment_speed_from_post'].replace([float('inf'), float('-inf')], ml_features['comment_speed_from_post'][~np.isinf(ml_features['comment_speed_from_post'])].max() * 10)
+
+# Define the quantiles for comment_speed_from_parent
+quantiles = ml_features['comment_speed_from_parent'].quantile([0.5, 0.95, 0.99])
+
+# Create categories for comment_speed_from_parent
+def categorize_speed(speed):
+    if pd.isna(speed):
+        return 'Unsuspicious'
+    elif speed <= quantiles[0.95]:
+        return 'Unsuspicious'
+    elif speed <= quantiles[0.99]:
+        return 'Suspicious'
+    else:
+        return 'Very Suspicious'
+
+# Apply the categorization and create a new categorical feature
+ml_features['comment_speed_from_parent_category'] = ml_features['comment_speed_from_parent'].apply(categorize_speed).astype('category')
+
+# Drop the original 'comment_speed_from_parent' column
+ml_features = ml_features.drop('comment_speed_from_parent', axis=1)
+
+# Add a feature for emdash presence
+ml_features['has_emdash'] = ml_features['comment_body'].str.contains('—').astype(int)
+
+ml_features.head(10)
+```
+
+
+```{python}
+ml_features['very_likely_bot'] = 0  # Initialize the column with 0
+
+# Define thresholds for bot-like behavior
+median_time_threshold = 30  # seconds
+comment_speed_threshold = ml_features['comment_speed_from_post'].quantile(0.999)  # 999th thousandth quantile
+
+# Label as bot if median time between comments is very low
+ml_features.loc[ml_features['median_secs_between_comments'] <= median_time_threshold, 'very_likely_bot'] = 1
+
+# Label as bot if comment speed from post is very high and user is not OP
+ml_features.loc[(ml_features['comment_speed_from_post'] >= comment_speed_threshold) & (ml_features['is_op'] == 0), 'very_likely_bot'] = 1
+
+# Label as bot if emdash is present and other features are suspicious
+ml_features.loc[
+    (ml_features['has_emdash'] == 1) &
+    ((ml_features['comment_speed_from_post'] >= ml_features['comment_speed_from_post'].quantile(0.99)) |
+     (ml_features['comment_speed_from_parent_category'] == "Very Suspicious") |
+     (ml_features['content_cosine_similarity'] >= ml_features['content_cosine_similarity'].quantile(0.99)) |
+     (ml_features['median_secs_between_comments'] >= ml_features['median_secs_between_comments'].quantile(0.99))),
+    'very_likely_bot'
+] = 1
+
+# If a user has been assigned very_likely_bot to one of their comments, assign the tag to all of their comments (ie all rows where comment_author is the very_likely_bot user)
+bot_authors = ml_features.loc[ml_features['very_likely_bot'] == 1, 'comment_author'].unique()
+
+for author in bot_authors:
+    ml_features.loc[ml_features['comment_author'] == author, 'very_likely_bot'] = 1
+
+ml_features.head(10)
+```
+
+
+```{python}
+ml_features['possible_bot'] = 0
+
+# Define thresholds
+median_time_threshold = 120  # seconds
+content_similarity_threshold = ml_features['content_cosine_similarity'].quantile(0.995)
+account_age_threshold = ml_features['account_age_days'].quantile(0.01)
+comment_speed_threshold = ml_features['comment_speed_from_post'].quantile(0.99)
+avg_comment_length_threshold = ml_features['avg_comment_length_chars'].quantile(0.01)
+
+# Apply conditions
+ml_features.loc[
+    (ml_features['comment_speed_from_parent_category'] == "Very Suspicious") |
+    (ml_features['median_secs_between_comments'] <= median_time_threshold) |
+    (ml_features['content_cosine_similarity'] >= content_similarity_threshold) |
+    (ml_features['account_age_days'] <= account_age_threshold) |
+    (ml_features['comment_speed_from_post'] >= comment_speed_threshold) |
+    (ml_features['has_emdash'] == 1) |
+    (ml_features['avg_comment_length_chars'] <= avg_comment_length_threshold) |
+    (ml_features['very_likely_bot'] == 1),
+    'possible_bot'
+] = 1
+
+# If a user has been assigned possible_bot to one of their comments, assign the tag to all of their comments (ie all rows where comment_author is the possible_bot user)
+possible_bot_authors = ml_features.loc[ml_features['possible_bot'] == 1, 'comment_author'].unique()
+
+for author in bot_authors:
+    ml_features.loc[ml_features['comment_author'] == author, 'possible_bot'] = 1
+
+ml_features.head(10)
+```
+
+
+```{python}
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.neural_network import MLPClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from sklearn.model_selection import train_test_split
+import seaborn as sns
+
+import matplotlib.pyplot as plt
+
+# Create a new target variable
+ml_features['bot_category'] = 0  # Default: not a bot
+ml_features.loc[ml_features['possible_bot'] == 1, 'bot_category'] = 1  # Possible bot
+ml_features.loc[ml_features['very_likely_bot'] == 1, 'bot_category'] = 2  # Very likely bot
+
+# Convert comment_speed_from_parent_category to categorical type
+ml_features['comment_speed_from_parent_category'] = pd.Categorical(
+    ml_features['comment_speed_from_parent_category'],
+    categories=['Unsuspicious', 'Suspicious', 'Very Suspicious'],
+    ordered=True
+)
+
+# Convert the categorical column to numerical before grouping
+ml_features['comment_speed_from_parent_category_numerical'] = ml_features['comment_speed_from_parent_category'].cat.codes
+
+# Group by user to create a user-level dataset
+user_level_data = ml_features.groupby('comment_author').agg({
+    'content_cosine_similarity': 'first',
+    'median_secs_between_comments': 'first',
+    'avg_comment_length_chars': 'first',
+    'comment_speed_from_post': 'median',
+    'comment_length': 'median',
+    'account_age_days': 'first',
+    'karma': 'first',
+    'has_emdash': 'max',
+    'comment_speed_from_parent_category_numerical': 'mean',
+    'bot_category': 'first'
+}).reset_index()
+
+# After grouping, rename the numerical column back to the original name and fill NaN values
+user_level_data.rename(columns={'comment_speed_from_parent_category_numerical': 'comment_speed_from_parent_category'}, inplace=True)
+user_level_data['comment_speed_from_parent_category'] = user_level_data['comment_speed_from_parent_category'].fillna(-1)
+
+# Prepare features and target
+X = user_level_data.drop(['comment_author', 'bot_category'], axis=1)
+y = user_level_data['bot_category']
+
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42069666, stratify=y)
+
+# Scale the features
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Initialize models
+models = {
+    'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
+    'SVM': SVC(probability=True, random_state=42),
+    'Neural Network': MLPClassifier(hidden_layer_sizes=(50, 25), max_iter=1000, random_state=42)
+}
+
+# Train and evaluate models
+results = {}
+
+for name, model in models.items():
+    # Train the model
+    model.fit(X_train_scaled, y_train)
+    
+    # Make predictions
+    y_pred = model.predict(X_test_scaled)
+    
+    # Calculate metrics
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred, average='weighted')
+    recall = recall_score(y_test, y_pred, average='weighted')
+    f1 = f1_score(y_test, y_pred, average='weighted')
+    
+    # Store results
+    results[name] = {
+        'Accuracy': accuracy,
+        'Precision': precision,
+        'Recall': recall,
+        'F1 Score': f1,
+        'Confusion Matrix': confusion_matrix(y_test, y_pred),
+        'Model': model
+    }
+    
+    print(f"{name} Results:")
+    print(f"Accuracy: {accuracy:.4f}")
+    print(f"Precision: {precision:.4f}")
+    print(f"Recall: {recall:.4f}")
+    print(f"F1 Score: {f1:.4f}")
+    print("Confusion Matrix:")
+    print(confusion_matrix(y_test, y_pred))
+    print("\n")
+
+# Plot results
+metrics = ['Accuracy', 'Precision', 'Recall', 'F1 Score']
+results_df = pd.DataFrame({
+    model_name: [results[model_name][metric] for metric in metrics]
+    for model_name in models.keys()
+}, index=metrics)
+
+# Plot the metrics comparison
+plt.figure(figsize=(10, 6))
+results_df.plot(kind='bar')
+plt.title('Model Performance Comparison')
+plt.ylabel('Score')
+plt.xlabel('Metric')
+plt.xticks(rotation=45)
+plt.legend(title='Model')
+plt.tight_layout()
+plt.show()
+
+# Plot confusion matrices
+fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+model_names = list(models.keys())
+
+for i, (name, ax) in enumerate(zip(model_names, axes)):
+    cm = results[name]['Confusion Matrix']
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax)
+    ax.set_title(f'{name} Confusion Matrix')
+    ax.set_xlabel('Predicted Labels')
+    ax.set_ylabel('True Labels')
+    ax.set_xticklabels(['Not Bot', 'Possible Bot', 'Very Likely Bot'])
+    ax.set_yticklabels(['Not Bot', 'Possible Bot', 'Very Likely Bot'])
+
+plt.tight_layout()
+plt.show()
+
+# Feature importance for Random Forest
+if 'Random Forest' in results:
+    rf_model = results['Random Forest']['Model']
+    feature_importance = pd.DataFrame({
+        'Feature': X.columns,
+        'Importance': rf_model.feature_importances_
+    }).sort_values(by='Importance', ascending=False)
+    
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x='Importance', y='Feature', data=feature_importance)
+    plt.title('Random Forest Feature Importance')
+    plt.tight_layout()
+    plt.show()
+```
+
+
+```{python}
+from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans, DBSCAN
+from sklearn.metrics import silhouette_score
+
+# Prepare features
+X = user_level_data.drop(['comment_author', 'bot_category'], axis=1)
+
+# Scale the features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Apply PCA for dimensionality reduction
+pca = PCA(n_components=2)  # Reduce to 2 components for easy plotting
+X_pca = pca.fit_transform(X_scaled)
+
+# Determine optimal number of clusters for K-means using Silhouette Score
+silhouette_scores = []
+for n_clusters in range(2, 6):  # Try different numbers of clusters
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+    cluster_labels = kmeans.fit_predict(X_pca)
+    silhouette_avg = silhouette_score(X_pca, cluster_labels)
+    silhouette_scores.append(silhouette_avg)
+
+# Select the number of clusters with the highest Silhouette Score
+optimal_n_clusters = range(2, 6)[silhouette_scores.index(max(silhouette_scores))]
+
+# Perform K-means clustering with optimal number of clusters
+kmeans = KMeans(n_clusters=optimal_n_clusters, random_state=42, n_init=10)
+kmeans_clusters = kmeans.fit_predict(X_pca)
+
+# Determine optimal DBSCAN parameters using Silhouette Score
+best_dbscan_score = -1
+optimal_eps = None
+optimal_min_samples = None
+
+for eps in [0.1, 0.5, 1.0, 1.5]:
+    for min_samples in [5, 10, 15]:
+        dbscan = DBSCAN(eps=eps, min_samples=min_samples)
+        dbscan_clusters = dbscan.fit_predict(X_pca)
+        
+        # DBSCAN may result in all points being noise (cluster -1).  Need at least 2 clusters to calculate silhouette score
+        if len(set(dbscan_clusters)) > 1:
+            dbscan_score = silhouette_score(X_pca, dbscan_clusters)
+            if dbscan_score > best_dbscan_score:
+                best_dbscan_score = dbscan_score
+                optimal_eps = eps
+                optimal_min_samples = min_samples
+
+# Perform DBSCAN clustering with optimal parameters
+dbscan = DBSCAN(eps=optimal_eps, min_samples=optimal_min_samples)  # Adjust eps and min_samples as needed
+dbscan_clusters = dbscan.fit_predict(X_pca)
+
+# Create a DataFrame for plotting
+pca_df = pd.DataFrame(data=X_pca, columns=['PCA1', 'PCA2'])
+pca_df['KMeans Cluster'] = kmeans_clusters
+pca_df['DBSCAN Cluster'] = dbscan_clusters
+pca_df['Bot Category'] = y.map({0: 'Likely Human', 1: 'Possible Bot', 2: 'Likely Bot'}).values  # Add actual bot categories for comparison
+
+# Get the loading vectors
+loadings = pca.components_
+
+# Determine the most important features for each component
+feature_names = X.columns
+pc1_loadings = pd.Series(loadings[0], index=feature_names)
+pc2_loadings = pd.Series(loadings[1], index=feature_names)
+
+# Identify top features for each component
+pc1_top_features = pc1_loadings.abs().nlargest(3).index.tolist()
+pc2_top_features = pc2_loadings.abs().nlargest(3).index.tolist()
+
+# Label the principal components
+pc1_label = f"PC1 ({', '.join(pc1_top_features)})"
+pc2_label = f"PC2 ({', '.join(pc2_top_features)})"
+```
+
+
+```{python}
+# Visualize the KMeans clusters
+plt.figure(figsize=(12, 10))
+plt.subplot(2, 1, 1)
+sns.scatterplot(x='PCA1', y='PCA2', hue='KMeans Cluster', style='Bot Category', data=pca_df, palette='viridis', alpha=0.7, s=100)
+plt.title('K-Means Clustering of User Features')
+plt.xlabel(pc1_label)
+plt.ylabel(pc2_label)
+
+# Visualize the DBSCAN clusters
+plt.subplot(2, 1, 2)
+sns.scatterplot(x='PCA1', y='PCA2', hue='DBSCAN Cluster', style='Bot Category', data=pca_df, palette='viridis', alpha=0.7, s=100)
+plt.title('DBSCAN Clustering of User Features')
+plt.xlabel(pc1_label)
+plt.ylabel(pc2_label)
+
+plt.tight_layout()
+plt.show()
+```
+
+
+```{python}
+import pandas as pd
+import numpy as np
+import seaborn as sns
+from nltk.sentiment import SentimentIntensityAnalyzer
+from textblob import TextBlob
+import re
+from collections import Counter
+from wordcloud import WordCloud
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+import string
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+import textstat
+from nrclex import NRCLex
+
+# Import necessary libraries
+import matplotlib.pyplot as plt
+
+# Download necessary NLTK resources
+nltk.download('punkt', quiet=True)
+nltk.download('stopwords', quiet=True)
+nltk.download('vader_lexicon', quiet=True)
+
+# Create a filter removing AutoModerator and separating humans from bots
+ml_features_filtered = ml_features[ml_features['comment_author'] != 'AutoModerator'].copy()
+
+# Add a 'user_type' column
+ml_features_filtered['user_type'] = 'Human'
+ml_features_filtered.loc[ml_features_filtered['possible_bot'] == 1, 'user_type'] = 'Bot'
+ml_features_filtered.loc[ml_features_filtered['very_likely_bot'] == 1, 'user_type'] = 'Bot'
+
+# VADER Sentiment Analysis
+analyzer = SentimentIntensityAnalyzer()
+
+# Add sentiment scores
+ml_features_filtered['vader_compound'] = ml_features_filtered['comment_body'].apply(lambda x: analyzer.polarity_scores(x)['compound'])
+ml_features_filtered['vader_pos'] = ml_features_filtered['comment_body'].apply(lambda x: analyzer.polarity_scores(x)['pos'])
+ml_features_filtered['vader_neg'] = ml_features_filtered['comment_body'].apply(lambda x: analyzer.polarity_scores(x)['neg'])
+ml_features_filtered['vader_neu'] = ml_features_filtered['comment_body'].apply(lambda x: analyzer.polarity_scores(x)['neu'])
+
+# Calculate text complexity metrics
+ml_features_filtered['readability_score'] = ml_features_filtered['comment_body'].apply(lambda x: textstat.flesch_reading_ease(x))
+ml_features_filtered['complexity_score'] = ml_features_filtered['comment_body'].apply(lambda x: textstat.gunning_fog(x))
+
+# Function to detect slang or informal language
+def contains_slang(text):
+    # Simple slang detection based on common patterns
+    slang_patterns = [r'\blol\b', r'\bomg\b', r'\bbtw\b', r'\bidk\b', r'\bimo\b', r'\bfyi\b', 
+                      r'\bsmh\b', r'\bwtf\b', r'\baf\b', r'\bfr\b', r'\byolo\b', r'\btbh\b',
+                      r'\brofl\b', r'\blmao\b', r'\blmfao\b', r'\bbrb\b', r'\bafaik\b',
+                      r'\bftw\b', r'\bfml\b', r'\bomfg\b', r'\bidc\b', r'\bimho\b']
+    
+    for pattern in slang_patterns:
+        if re.search(pattern, text.lower()):
+            return 1
+    return 0
+
+# Function to count exclamation and question marks
+def count_punctuation(text):
+    exclamation_count = text.count('!')
+    question_count = text.count('?')
+    return exclamation_count, question_count
+
+# Apply the slang detection and punctuation counting
+ml_features_filtered['contains_slang'] = ml_features_filtered['comment_body'].apply(contains_slang)
+ml_features_filtered['exclamation_count'] = ml_features_filtered['comment_body'].apply(lambda x: count_punctuation(x)[0])
+ml_features_filtered['question_count'] = ml_features_filtered['comment_body'].apply(lambda x: count_punctuation(x)[1])
+
+# Emotion Detection using NRCLex
+def extract_emotions(text):
+    emotion_scores = NRCLex(text).affect_frequencies
+    return emotion_scores
+
+# Extract a sample due to computational constraints
+sample_size = min(1000, len(ml_features_filtered))
+emotions_sample = ml_features_filtered.sample(sample_size, random_state=42)
+
+# Apply emotion extraction
+emotions_df = pd.DataFrame([extract_emotions(text) for text in emotions_sample['comment_body']])
+emotions_sample = pd.concat([emotions_sample.reset_index(drop=True), emotions_df.reset_index(drop=True)], axis=1)
+
+# Create visualization for sentiment comparison
+plt.figure(figsize=(16, 12))
+
+# 1. VADER Sentiment Distribution
+plt.subplot(2, 2, 1)
+sns.boxplot(x='user_type', y='vader_compound', data=ml_features_filtered)
+plt.title('VADER Sentiment Scores by User Type')
+plt.xlabel('User Type')
+plt.ylabel('Compound Sentiment Score')
+
+# 2. Emotion Comparison
+plt.subplot(2, 2, 2)
+emotion_cols = ['fear', 'anger', 'anticipation', 'trust', 'surprise', 'sadness', 'disgust', 'joy']
+emotions_by_type = emotions_sample.groupby('user_type')[emotion_cols].mean()
+emotions_by_type.T.plot(kind='bar', ax=plt.gca())
+plt.title('Average Emotion Intensity by User Type')
+plt.xlabel('Emotion')
+plt.ylabel('Average Intensity')
+plt.xticks(rotation=45)
+plt.legend(title='User Type')
+
+# 3. Text Complexity
+plt.subplot(2, 2, 3)
+sns.boxplot(x='user_type', y='readability_score', data=ml_features_filtered)
+plt.title('Text Readability by User Type')
+plt.xlabel('User Type')
+plt.ylabel('Flesch Reading Ease Score')
+
+# 4. Slang Usage
+plt.subplot(2, 2, 4)
+slang_by_type = ml_features_filtered.groupby('user_type')['contains_slang'].mean()
+slang_by_type.plot(kind='bar', ax=plt.gca())
+plt.title('Slang Usage by User Type')
+plt.xlabel('User Type')
+plt.ylabel('Proportion of Comments with Slang')
+
+plt.tight_layout()
+plt.show()
+
+# Extract common words by user type
+def get_common_words(texts, n=20):
+    # Tokenize and clean
+    stop_words = set(stopwords.words('english'))
+    stop_words.update(['would', 'could', 'also', 'one', 'like', 'get', 'even', 'say', 'said', 'make', 'think', 'know'])
+    
+    words = []
+    for text in texts:
+        tokens = word_tokenize(text.lower())
+        # Remove stopwords, punctuation, and non-alphabetic tokens
+        words.extend([word for word in tokens if word not in stop_words 
+                     and word not in string.punctuation 
+                     and word.isalpha() 
+                     and len(word) > 2]) #this line filters out words of length 3 or more
+    
+    return Counter(words).most_common(n)
+
+# Get most common words for humans and bots
+human_texts = ml_features_filtered[ml_features_filtered['user_type'] == 'Human']['comment_body'].tolist()
+bot_texts = ml_features_filtered[ml_features_filtered['user_type'] == 'Bot']['comment_body'].tolist()
+
+human_common_words = get_common_words(human_texts)
+bot_common_words = get_common_words(bot_texts)
+
+# Create word clouds
+plt.figure(figsize=(16, 8))
+
+# Word cloud for humans
+plt.subplot(1, 2, 1)
+human_wordcloud = WordCloud(width=800, height=400, background_color='white', 
+                           max_words=100, colormap='viridis', min_word_length=3).generate(' '.join(human_texts))
+plt.imshow(human_wordcloud, interpolation='bilinear')
+plt.title('Word Cloud for Human Comments')
+plt.axis('off')
+
+# Word cloud for bots
+plt.subplot(1, 2, 2)
+bot_wordcloud = WordCloud(width=800, height=400, background_color='white', 
+                         max_words=100, colormap='plasma', min_word_length=3).generate(' '.join(bot_texts))
+plt.imshow(bot_wordcloud, interpolation='bilinear')
+plt.title('Word Cloud for Bot Comments')
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+
+# Compare linguistic style metrics
+plt.figure(figsize=(16, 12))
+
+# 1. Comment Length Comparison
+plt.subplot(2, 2, 1)
+sns.boxplot(x='user_type', y='comment_length', data=ml_features_filtered)
+plt.title('Comment Length by User Type')
+plt.xlabel('User Type')
+plt.ylabel('Comment Length (Characters)')
+
+# 2. Complexity Score Comparison
+plt.subplot(2, 2, 2)
+sns.boxplot(x='user_type', y='complexity_score', data=ml_features_filtered)
+plt.title('Text Complexity by User Type')
+plt.xlabel('User Type')
+plt.ylabel('Gunning Fog Index')
+
+# 3. Exclamation Mark Usage
+plt.subplot(2, 2, 3)
+sns.boxplot(x='user_type', y='exclamation_count', data=ml_features_filtered)
+plt.title('Exclamation Mark Usage by User Type')
+plt.xlabel('User Type')
+plt.ylabel('Number of Exclamation Marks')
+
+# 4. Question Mark Usage
+plt.subplot(2, 2, 4)
+sns.boxplot(x='user_type', y='question_count', data=ml_features_filtered)
+plt.title('Question Mark Usage by User Type')
+plt.xlabel('User Type')
+plt.ylabel('Number of Question Marks')
+
+plt.tight_layout()
+plt.show()
+
+# Generate summary report
+human_sentiment = ml_features_filtered[ml_features_filtered['user_type'] == 'Human']['vader_compound'].mean()
+bot_sentiment = ml_features_filtered[ml_features_filtered['user_type'] == 'Bot']['vader_compound'].mean()
+
+human_emotions = emotions_sample[emotions_sample['user_type'] == 'Human'][emotion_cols].mean()
+bot_emotions = emotions_sample[emotions_sample['user_type'] == 'Bot'][emotion_cols].mean()
+
+# Print human top emotions
+human_top_emotions = human_emotions.sort_values(ascending=False).head(3)
+bot_top_emotions = bot_emotions.sort_values(ascending=False).head(3)
+
+print("\n=== SENTIMENT ANALYSIS SUMMARY ===\n")
+print(f"Human Average Sentiment: {human_sentiment:.4f}")
+print(f"Bot Average Sentiment: {bot_sentiment:.4f}")
+print("\nDominant Human Emotions:")
+for emotion, score in human_top_emotions.items():
+    print(f"- {emotion.capitalize()}: {score:.4f}")
+print("\nDominant Bot Emotions:")
+for emotion, score in bot_top_emotions.items():
+    print(f"- {emotion.capitalize()}: {score:.4f}")
+
+print("\nTop 10 Common Words in Human Comments:")
+for word, count in human_common_words[:10]:
+    print(f"- {word}: {count}")
+
+print("\nTop 10 Common Words in Bot Comments:")
+for word, count in bot_common_words[:10]:
+    print(f"- {word}: {count}")
+
+print("\nLinguistic Style Comparison:")
+print(f"Human Average Readability Score: {ml_features_filtered[ml_features_filtered['user_type'] == 'Human']['readability_score'].mean():.2f}")
+print(f"Bot Average Readability Score: {ml_features_filtered[ml_features_filtered['user_type'] == 'Bot']['readability_score'].mean():.2f}")
+print(f"Human Average Complexity Score: {ml_features_filtered[ml_features_filtered['user_type'] == 'Human']['complexity_score'].mean():.2f}")
+print(f"Bot Average Complexity Score: {ml_features_filtered[ml_features_filtered['user_type'] == 'Bot']['complexity_score'].mean():.2f}")
+print(f"Human Slang Usage Rate: {ml_features_filtered[ml_features_filtered['user_type'] == 'Human']['contains_slang'].mean():.2%}")
+print(f"Bot Slang Usage Rate: {ml_features_filtered[ml_features_filtered['user_type'] == 'Bot']['contains_slang'].mean():.2%}")
+```
+
+
+```{python}
+import pandas as pd
+import numpy as np
+import seaborn as sns
+from nltk.sentiment import SentimentIntensityAnalyzer
+from textblob import TextBlob
+import re
+from collections import Counter
+from wordcloud import WordCloud
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+import string
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+import textstat
+from nrclex import NRCLex
+
+# Import necessary libraries
+import matplotlib.pyplot as plt
+
+# Download necessary NLTK resources
+nltk.download('punkt', quiet=True)
+nltk.download('stopwords', quiet=True)
+nltk.download('vader_lexicon', quiet=True)
+
+# Create a filter removing AutoModerator first
+recent_user_comments_filtered = recent_user_comments[recent_user_comments['author'] != 'AutoModerator'].copy()
+
+# Create a new column 'user_type' in recent_user_comments_filtered
+recent_user_comments_filtered['user_type'] = 'Human'  # Default to Human
+
+# Merge ml_features with recent_user_comments_filtered on 'author' to identify bots
+recent_user_comments_filtered = pd.merge(
+    recent_user_comments_filtered,
+    ml_features[['comment_author', 'possible_bot', 'very_likely_bot']],
+    left_on='author',
+    right_on='comment_author',
+    how='left'
+)
+
+# Remove duplicate rows based on 'comment_id', keeping only the first occurrence
+recent_user_comments_filtered = recent_user_comments_filtered.drop_duplicates(subset='comment_id', keep='first')
+
+# Fill NaN values in 'possible_bot' and 'very_likely_bot' with 0 (not a bot)
+recent_user_comments_filtered['possible_bot'] = recent_user_comments_filtered['possible_bot'].fillna(0).astype(int)
+recent_user_comments_filtered['very_likely_bot'] = recent_user_comments_filtered['very_likely_bot'].fillna(0).astype(int)
+
+# Update 'user_type' based on bot classifications
+recent_user_comments_filtered.loc[recent_user_comments_filtered['possible_bot'] == 1, 'user_type'] = 'Bot'
+recent_user_comments_filtered.loc[recent_user_comments_filtered['very_likely_bot'] == 1, 'user_type'] = 'Bot'
+
+# Drop unnecessary columns after the merge
+recent_user_comments_filtered = recent_user_comments_filtered.drop(['comment_author', 'possible_bot', 'very_likely_bot'], axis=1)
+
+# VADER Sentiment Analysis
+analyzer = SentimentIntensityAnalyzer()
+
+# Add sentiment scores
+recent_user_comments_filtered['vader_compound'] = recent_user_comments_filtered['body'].apply(lambda x: analyzer.polarity_scores(x)['compound'])
+recent_user_comments_filtered['vader_pos'] = recent_user_comments_filtered['body'].apply(lambda x: analyzer.polarity_scores(x)['pos'])
+recent_user_comments_filtered['vader_neg'] = recent_user_comments_filtered['body'].apply(lambda x: analyzer.polarity_scores(x)['neg'])
+recent_user_comments_filtered['vader_neu'] = recent_user_comments_filtered['body'].apply(lambda x: analyzer.polarity_scores(x)['neu'])
+
+# Calculate text complexity metrics
+recent_user_comments_filtered['comment_length'] = recent_user_comments_filtered['body'].apply(len)
+recent_user_comments_filtered['readability_score'] = recent_user_comments_filtered['body'].apply(lambda x: textstat.flesch_reading_ease(x))
+recent_user_comments_filtered['complexity_score'] = recent_user_comments_filtered['body'].apply(lambda x: textstat.gunning_fog(x))
+
+# Function to detect slang or informal language
+def contains_slang(text):
+    # Simple slang detection based on common patterns
+    slang_patterns = [r'\blol\b', r'\bomg\b', r'\bbtw\b', r'\bidk\b', r'\bimo\b', r'\bfyi\b', 
+                      r'\bsmh\b', r'\bwtf\b', r'\baf\b', r'\bfr\b', r'\byolo\b', r'\btbh\b',
+                      r'\brofl\b', r'\blmao\b', r'\blmfao\b', r'\bbrb\b', r'\bafaik\b',
+                      r'\bftw\b', r'\bfml\b', r'\bomfg\b', r'\bidc\b', r'\bimho\b']
+    
+    for pattern in slang_patterns:
+        if re.search(pattern, text.lower()):
+            return 1
+    return 0
+
+# Function to count exclamation and question marks
+def count_punctuation(text):
+    exclamation_count = text.count('!')
+    question_count = text.count('?')
+    return exclamation_count, question_count
+
+# Apply the slang detection and punctuation counting
+recent_user_comments_filtered['contains_slang'] = recent_user_comments_filtered['body'].apply(contains_slang)
+recent_user_comments_filtered['exclamation_count'] = recent_user_comments_filtered['body'].apply(lambda x: count_punctuation(x)[0])
+recent_user_comments_filtered['question_count'] = recent_user_comments_filtered['body'].apply(lambda x: count_punctuation(x)[1])
+
+# Emotion Detection using NRCLex
+def extract_emotions(text):
+    emotion_scores = NRCLex(text).affect_frequencies
+    return emotion_scores
+
+# Extract a sample due to computational constraints
+sample_size = min(1000, len(recent_user_comments_filtered))
+emotions_sample = recent_user_comments_filtered.sample(sample_size, random_state=42)
+
+# Apply emotion extraction
+emotions_df = pd.DataFrame([extract_emotions(text) for text in emotions_sample['body']])
+emotions_sample = pd.concat([emotions_sample.reset_index(drop=True), emotions_df.reset_index(drop=True)], axis=1)
+
+# Create visualization for sentiment comparison
+plt.figure(figsize=(16, 12))
+
+# 1. VADER Sentiment Distribution
+plt.subplot(2, 2, 1)
+sns.boxplot(x='user_type', y='vader_compound', data=recent_user_comments_filtered)
+plt.title('VADER Sentiment Scores by User Type')
+plt.xlabel('User Type')
+plt.ylabel('Compound Sentiment Score')
+
+# 2. Emotion Comparison
+plt.subplot(2, 2, 2)
+emotion_cols = ['fear', 'anger', 'anticipation', 'trust', 'surprise', 'sadness', 'disgust', 'joy']
+emotions_by_type = emotions_sample.groupby('user_type')[emotion_cols].mean()
+emotions_by_type.T.plot(kind='bar', ax=plt.gca())
+plt.title('Average Emotion Intensity by User Type')
+plt.xlabel('Emotion')
+plt.ylabel('Average Intensity')
+plt.xticks(rotation=45)
+plt.legend(title='User Type')
+
+# 3. Text Complexity
+plt.subplot(2, 2, 3)
+sns.boxplot(x='user_type', y='readability_score', data=recent_user_comments_filtered)
+plt.title('Text Readability by User Type')
+plt.xlabel('User Type')
+plt.ylabel('Flesch Reading Ease Score')
+
+# 4. Slang Usage
+plt.subplot(2, 2, 4)
+slang_by_type = recent_user_comments_filtered.groupby('user_type')['contains_slang'].mean()
+slang_by_type.plot(kind='bar', ax=plt.gca())
+plt.title('Slang Usage by User Type')
+plt.xlabel('User Type')
+plt.ylabel('Proportion of Comments with Slang')
+
+plt.tight_layout()
+plt.show()
+
+# Extract common words by user type
+def get_common_words(texts, n=20):
+    # Tokenize and clean
+    stop_words = set(stopwords.words('english'))
+    stop_words.update(['would', 'could', 'also', 'one', 'like', 'get', 'even', 'say', 'said', 'make', 'think', 'know'])
+    
+    words = []
+    for text in texts:
+        tokens = word_tokenize(text.lower())
+        # Remove stopwords, punctuation, and non-alphabetic tokens
+        words.extend([word for word in tokens if word not in stop_words 
+                     and word not in string.punctuation 
+                     and word.isalpha() 
+                     and len(word) > 2])
+    
+    return Counter(words).most_common(n)
+
+# Get most common words for humans and bots
+human_texts = recent_user_comments_filtered[recent_user_comments_filtered['user_type'] == 'Human']['body'].tolist()
+bot_texts = recent_user_comments_filtered[recent_user_comments_filtered['user_type'] == 'Bot']['body'].tolist()
+
+human_common_words = get_common_words(human_texts)
+bot_common_words = get_common_words(bot_texts)
+
+# Create word clouds
+plt.figure(figsize=(16, 8))
+
+# Word cloud for humans
+plt.subplot(1, 2, 1)
+human_wordcloud = WordCloud(width=800, height=400, background_color='white', 
+                           max_words=100, colormap='viridis', min_word_length=3).generate(' '.join(human_texts))
+plt.imshow(human_wordcloud, interpolation='bilinear')
+plt.title('Word Cloud for Human Comments')
+plt.axis('off')
+
+# Word cloud for bots
+plt.subplot(1, 2, 2)
+bot_wordcloud = WordCloud(width=800, height=400, background_color='white', 
+                         max_words=100, colormap='plasma', min_word_length=3).generate(' '.join(bot_texts))
+plt.imshow(bot_wordcloud, interpolation='bilinear')
+plt.title('Word Cloud for Bot Comments')
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+
+# Compare linguistic style metrics
+plt.figure(figsize=(16, 12))
+
+# 1. Comment Length Comparison
+plt.subplot(2, 2, 1)
+sns.boxplot(x='user_type', y='comment_length', data=recent_user_comments_filtered)
+plt.title('Comment Length by User Type')
+plt.xlabel('User Type')
+plt.ylabel('Comment Length (Characters)')
+
+# 2. Complexity Score Comparison
+plt.subplot(2, 2, 2)
+sns.boxplot(x='user_type', y='complexity_score', data=recent_user_comments_filtered)
+plt.title('Text Complexity by User Type')
+plt.xlabel('User Type')
+plt.ylabel('Gunning Fog Index')
+
+# 3. Exclamation Mark Usage
+plt.subplot(2, 2, 3)
+sns.boxplot(x='user_type', y='exclamation_count', data=recent_user_comments_filtered)
+plt.title('Exclamation Mark Usage by User Type')
+plt.xlabel('User Type')
+plt.ylabel('Number of Exclamation Marks')
+
+# 4. Question Mark Usage
+plt.subplot(2, 2, 4)
+sns.boxplot(x='user_type', y='question_count', data=recent_user_comments_filtered)
+plt.title('Question Mark Usage by User Type')
+plt.xlabel('User Type')
+plt.ylabel('Number of Question Marks')
+
+plt.tight_layout()
+plt.show()
+
+# Generate summary report
+human_sentiment = recent_user_comments_filtered[recent_user_comments_filtered['user_type'] == 'Human']['vader_compound'].mean()
+bot_sentiment = recent_user_comments_filtered[recent_user_comments_filtered['user_type'] == 'Bot']['vader_compound'].mean()
+
+human_emotions = emotions_sample[emotions_sample['user_type'] == 'Human'][emotion_cols].mean()
+bot_emotions = emotions_sample[emotions_sample['user_type'] == 'Bot'][emotion_cols].mean()
+
+# Print human top emotions
+human_top_emotions = human_emotions.sort_values(ascending=False).head(3)
+bot_top_emotions = bot_emotions.sort_values(ascending=False).head(3)
+
+print("\n=== SENTIMENT ANALYSIS SUMMARY ===\n")
+print(f"Human Average Sentiment: {human_sentiment:.4f}")
+print(f"Bot Average Sentiment: {bot_sentiment:.4f}")
+print("\nDominant Human Emotions:")
+for emotion, score in human_top_emotions.items():
+    print(f"- {emotion.capitalize()}: {score:.4f}")
+print("\nDominant Bot Emotions:")
+for emotion, score in bot_top_emotions.items():
+    print(f"- {emotion.capitalize()}: {score:.4f}")
+
+print("\nTop 10 Common Words in Human Comments:")
+for word, count in human_common_words[:10]:
+    print(f"- {word}: {count}")
+
+print("\nTop 10 Common Words in Bot Comments:")
+for word, count in bot_common_words[:10]:
+    print(f"- {word}: {count}")
+
+print("\nLinguistic Style Comparison:")
+print(f"Human Average Readability Score: {recent_user_comments_filtered[recent_user_comments_filtered['user_type'] == 'Human']['readability_score'].mean():.2f}")
+print(f"Bot Average Readability Score: {recent_user_comments_filtered[recent_user_comments_filtered['user_type'] == 'Bot']['readability_score'].mean():.2f}")
+print(f"Human Average Complexity Score: {recent_user_comments_filtered[recent_user_comments_filtered['user_type'] == 'Human']['complexity_score'].mean():.2f}")
+print(f"Bot Average Complexity Score: {recent_user_comments_filtered[recent_user_comments_filtered['user_type'] == 'Bot']['complexity_score'].mean():.2f}")
+print(f"Human Slang Usage Rate: {recent_user_comments_filtered[recent_user_comments_filtered['user_type'] == 'Human']['contains_slang'].mean():.2%}")
+print(f"Bot Slang Usage Rate: {recent_user_comments_filtered[recent_user_comments_filtered['user_type'] == 'Bot']['contains_slang'].mean():.2%}")
+```
+
+
+```{python}
+import pandas as pd
+import numpy as np
+import seaborn as sns
+from nltk.sentiment import SentimentIntensityAnalyzer
+from textblob import TextBlob
+import re
+from collections import Counter
+from wordcloud import WordCloud
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+import string
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+import textstat
+from nrclex import NRCLex
+
+# Import necessary libraries
+import matplotlib.pyplot as plt
+
+# Download necessary NLTK resources
+nltk.download('punkt', quiet=True)
+nltk.download('stopwords', quiet=True)
+nltk.download('vader_lexicon', quiet=True)
+
+# Sentiment Analysis by Subreddit
+analyzer = SentimentIntensityAnalyzer()
+processed_comments['vader_compound'] = processed_comments['comment_body'].apply(lambda x: analyzer.polarity_scores(x)['compound'])
+
+# Group by subreddit and calculate average sentiment
+subreddit_sentiment = processed_comments.groupby('subreddit')['vader_compound'].mean().sort_values(ascending=False)
+
+# Plotting the sentiment by subreddit
+plt.figure(figsize=(12, 8))
+subreddit_sentiment.plot(kind='bar')
+plt.title('Average Sentiment by Subreddit')
+plt.xlabel('Subreddit')
+plt.ylabel('Average Compound Sentiment Score')
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+plt.show()
+
+# Word Clouds by Subreddit
+def generate_word_cloud(text, title):
+    wordcloud = WordCloud(width=800, height=400, background_color='white', min_word_length=3).generate(text)
+    plt.figure(figsize=(10, 5))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.title(title)
+    plt.axis('off')
+    plt.show()
+
+# Group comments by subreddit
+grouped_comments = processed_comments.groupby('subreddit')['comment_body'].apply(lambda x: ' '.join(x))
+
+# Generate word clouds for top subreddits
+top_n = 5  # Number of top subreddits to display
+top_subreddits = grouped_comments.head(top_n)
+
+for subreddit, text in top_subreddits.items():
+    generate_word_cloud(text, f'Word Cloud for /r/{subreddit}')
+```
+
+
+```{python}
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import seaborn as sns
+import numpy as np
+
+# Create subreddit cross-similarity heatmaps
+import matplotlib.pyplot as plt
+
+# Group comments by subreddit
+subreddit_texts = processed_comments.groupby('subreddit')['comment_body'].apply(lambda x: ' '.join(x))
+
+# Get the top subreddits by comment count
+top_subreddits = processed_comments['subreddit'].value_counts().head(15).index.tolist()
+
+# Filter to include only top subreddits
+filtered_texts = subreddit_texts[subreddit_texts.index.isin(top_subreddits)]
+
+# Calculate TF-IDF vectors for each subreddit's combined text
+vectorizer = TfidfVectorizer(max_features=5000, stop_words='english', min_df=2)
+tfidf_matrix = vectorizer.fit_transform(filtered_texts)
+
+# Calculate cosine similarity between subreddits
+similarity_matrix = cosine_similarity(tfidf_matrix)
+
+# Create a DataFrame for the similarity matrix
+similarity_df = pd.DataFrame(
+    similarity_matrix, 
+    index=filtered_texts.index, 
+    columns=filtered_texts.index
+)
+
+# Plot the heatmap
+plt.figure(figsize=(12, 10))
+sns.heatmap(similarity_df, annot=True, cmap='YlGnBu', vmin=0.5, vmax=1, linewidths=0.5)
+plt.title('Cross-Subreddit Content Similarity Heatmap')
+plt.tight_layout()
+plt.show()
+
+# Extract the most distinguishing terms for each subreddit
+feature_names = np.array(vectorizer.get_feature_names_out())
+
+def get_top_features(tfidf_matrix, feature_names, top_n=10):
+    """Get the top N most distinctive features for each subreddit"""
+    top_features = {}
+    
+    for i, subreddit in enumerate(filtered_texts.index):
+        # Get the TF-IDF scores for this subreddit
+        tfidf_scores = tfidf_matrix[i].toarray().flatten()
+        
+        # Get indices of top N features
+        top_indices = tfidf_scores.argsort()[-top_n:][::-1]
+        
+        # Get feature names and scores
+        top_terms = [(feature_names[idx], tfidf_scores[idx]) for idx in top_indices]
+        
+        top_features[subreddit] = top_terms
+    
+    return top_features
+
+subreddit_top_terms = get_top_features(tfidf_matrix, feature_names)
+```
+
+
+```{python}
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+from google import genai
+from google.genai import types
+from wordcloud import WordCloud
+import random
+
+# ----- Step 1: Extract Top 5 Subreddits from ml_features -----
+# Assume ml_features is already in your environment.
+top_subreddits = ml_features['subreddit'].value_counts().head(5).index.tolist()
+
+# ----- Step 2: Stratified Sampling ----- 
+sampled_comments = {}
+sample_size = 100
+for subreddit in top_subreddits:
+    subreddit_comments = ml_features[ml_features['subreddit'] == subreddit]['comment_body']
+    if len(subreddit_comments) > sample_size:
+        sampled = subreddit_comments.sample(n=sample_size, random_state=42)
+    else:
+        sampled = subreddit_comments
+    sampled_comments[subreddit] = sampled.tolist()
+
+# ----- Step 3: Gemini API generate() Function -----
+def generate(prompt):
+    client = genai.Client(
+        api_key=os.getenv("GEMINI_API_KEY"),
+    )
+    model = "gemini-2.0-flash"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text=prompt),
+            ],
+        ),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        temperature=0,
+        top_p=0,
+        top_k=1,
+        max_output_tokens=8192,
+        response_mime_type="text/plain",
+    )
+    complete_response = ""
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        complete_response += chunk.text
+    return complete_response.strip()
+
+# ----- Step 4: Query the LLM for Each Subreddit -----
+subreddit_responses = {}
+for subreddit, comments in sampled_comments.items():
+    # Take a random sample of comments if there are too many
+    if len(" ".join(comments)) > 4000:
+        random.seed(42)  # For reproducibility
+        sampled_comments = random.sample(comments, min(len(comments), 50))
+        text_blob = " ".join(sampled_comments)[:4000]
+    else:
+        text_blob = " ".join(comments)[:4000]
+    prompt = (
+        f"Perform sentiment analysis on the following comments from subreddit /r/{subreddit}. "
+        "Identify 20 unique keywords (based exclusively on the text you are fed) that capture the essence of this subreddit (which can later be used for word clouds), and provide a brief sentiment summary (e.g. note if the overall tone is positive, negative, or neutral). "
+        "At the end, on a new separate line, output exactly: 'Keywords: keyword1, keyword2, etc.' followed by a comma-separated list of the keywords, with no extra text.\n\nComments:\n" 
+        + text_blob
+    )
+    response = generate(prompt)
+    subreddit_responses[subreddit] = response
+    print(f"/r/{subreddit} Response:\n{response}\n{'-'*60}\n")
+
+# ----- Step 5: Extract Keywords and Build Word Clouds -----
+for subreddit, response in subreddit_responses.items():
+    keywords_line = None
+    for line in response.splitlines():
+        if line.strip().startswith("Keywords:"):
+            keywords_line = line.strip()
+            break
+    if keywords_line:
+        # Remove the "Keywords:" prefix and extra spaces, then split by commas.
+        keywords_part = keywords_line[len("Keywords:"):].strip()
+        keywords = [kw.strip() for kw in keywords_part.split(",") if kw.strip()]
+    else:
+        keywords = []
+    
+    if keywords:
+        # Create a text blob from keywords for word cloud generation.
+        wordcloud_text = " ".join(keywords)
+        wc = WordCloud(width=800, height=400, background_color='white', min_word_length=3).generate(wordcloud_text)
+        plt.figure(figsize=(8, 4))
+        plt.imshow(wc, interpolation="bilinear")
+        plt.axis("off")
+        plt.title(f"/r/{subreddit} Word Cloud")
+        plt.show()
+    else:
+        print(f"No valid keywords extracted for /r/{subreddit}.")
+```

@@ -27,6 +27,7 @@ format:
 execute:
     cache: true
     # echo: false
+    warning: false
 bibliography: extra/references.bib
 csl: extra/apa7-numeric-superscript-brackets-nocommas.csl
 # nocite: |
