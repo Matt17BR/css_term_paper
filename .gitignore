@@ -5,7 +5,7 @@ extra/Guidelines - Research design.pdf
 research_design/research_design.fdb_latexmk
 .env
 google_deep_research_output.md
-datasets/
 /.quarto/
 detecting_bots_on_reddit_code.fdb_latexmk
 /.jupyter_cache/
+/submission/

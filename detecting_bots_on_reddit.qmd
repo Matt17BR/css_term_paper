@@ -1,3 +1,12 @@
+<!-- \vfill
+\raggedleft
+\includegraphics[width=0.8\textwidth]{extra/lmu-siegel-nobg.png}
+\vfill -->
+
+\AddToHookNext{shipout/background}{%
+    \put (3.4in,-\paperheight){\includegraphics[width=0.6\paperwidth]{extra/lmu-siegel-nobg.png}}%
+}
+
 \newpage
 
 \tableofcontents
