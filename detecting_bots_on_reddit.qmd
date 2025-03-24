@@ -84,37 +84,21 @@ The code is designed to be as self-contained and well-commented as possible to f
 
 # Empirical Results
 
-## Descriptive Analysis of Bot Characteristics
+## Descriptive Summary of Heuristic Criteria
 
-The heuristic-based bot detection method identified a subset of Reddit accounts exhibiting characteristics consistent with bot-like behavior. Descriptive analysis of these flagged accounts revealed several key patterns:
-
-*   **Username Patterns:** A significant proportion of flagged accounts displayed usernames composed of random strings of letters and numbers or followed patterns associated with bot accounts, such as default Reddit-generated usernames.
-
-*   **Account Age:** Flagged accounts tended to be younger on average compared to non-flagged accounts, with a notable concentration of accounts less than a year old.
-
-*   **Karma Distribution:**  The karma scores of flagged accounts showed a bimodal distribution, with some accounts exhibiting very low karma and others surprisingly high karma. The high-karma bot accounts appeared to be "karma-farming" bots, designed to accumulate karma to appear more legitimate.
-
-*   **Posting Frequency:**  Flagged accounts exhibited significantly higher posting frequencies compared to non-flagged accounts. Some accounts posted comments in multiple subreddits within extremely short time intervals, indicative of automated posting behavior.
-
-*   **Content Repetitiveness:**  Analysis of comment content revealed a higher degree of text similarity and repetition among flagged accounts. Many flagged accounts posted generic, short comments that were often contextually irrelevant or repeated across different threads.
-
-*   **Em-dash Usage:** Flagged accounts showed a slightly higher prevalence of em-dash usage in their comments compared to non-flagged accounts, although this difference was not statistically significant in this analysis.
+The heuristic-based method, designed to flag accounts based on pre-defined meta-metric criteria, identified a specific subset of Reddit accounts. It is essential to understand that this section describes the output of the heuristic flagging process itself, and does not present independently validated findings about actual bot characteristics. The following keyword and sentiment analyses, presented next, similarly do not provide such independent validation. Therefore, this section is best understood as a brief, factual report on the direct output of the heuristic flagging process, rather than a conclusive analysis of bot characteristics. The limitations of this approach are further discussed in the conclusion.
 
 ## Cross-Subreddit Content Similarity and Narrative Amplification
 
 To understand the relationships between the top subreddits in terms of content, and to explore potential narrative amplification, a cross-subreddit content similarity analysis was conducted. Figure 1 displays a heatmap visualizing the cosine similarity of TF-IDF vectors generated from the combined text of comments within each of the top 5 subreddits.
 
-**Figure 1: Cross-Subreddit Content Similarity Heatmap**
+![Cross-Subreddit Content Similarity Heatmap: the heatmap visualizes the cosine similarity of TF-IDF vectors between the top 5 subreddits, with darker colors indicating higher similarity and lighter colors indicating lower similarity.](detecting_bots_on_reddit_code_files/figure-pdf/cell-28-output-1.pdf){width=100%}
 
-*(Figure 1: Cross-Subreddit Content Similarity Heatmap is inserted here - See Appendix B, Figure 9 in the original notebook)*
-
-*Note: The heatmap visualizes the cosine similarity of TF-IDF vectors between the top 5 subreddits, with darker colors indicating higher similarity and lighter colors indicating lower similarity.*
-
-As shown in Figure 1, the heatmap reveals moderate content similarity between certain subreddits.  `r/news` and `r/worldnews` exhibit the highest content similarity (0.81), which is expected given their overlapping topical focus on current events.  `r/politics` also shows relatively high similarity with `r/news` (0.80) and `r/worldnews` (0.72), indicating thematic connections between political discussions and news reporting.  `r/technology` and `r/science` show lower similarity with the news and politics subreddits, reflecting their distinct subject matter.  `r/science` and `r/technology` exhibit moderate similarity to each other (0.63). This suggests a thematic clustering where news and politics subreddits are more closely related in content, while technology and science form a separate, though somewhat related, cluster.  Bots operating across these subreddits might exploit these thematic connections to amplify narratives across related communities.
+As shown in Figure 1, the heatmap reveals moderate content similarity between certain subreddits.  r/news and r/worldnews exhibit one of the highest content similarities (0.81), which is expected given their overlapping topical focus on current events.  r/politics also shows relatively high similarity with r/news (0.80) and r/worldnews (0.72), indicating thematic connections between political discussions and news reporting.  r/technology and r/science show lower similarity with the news and politics subreddits, reflecting their distinct subject matter.  r/science and r/technology exhibit moderate similarity to each other (0.63). This suggests a thematic clustering where news and politics subreddits are more closely related in content, while technology and science form a separate, though somewhat related, cluster.  Bots operating across these subreddits might exploit these thematic connections to amplify narratives across related communities.
 
 Analysis of keyword frequencies and sentiment scores provided further insights into potential narrative amplification and polarization associated with flagged accounts.
 
-*   **Keyword Analysis:** Figure 2 shows the word cloud generated by Google Gemini for the r/politics subreddit. Keywords like "government," "election," "Democrats," and "Trump" are prominently featured, reflecting the politically charged nature of discussions in this subreddit. Keywords generated by Google Gemini for subreddits like r/politics and r/worldnews, which are known to be prone to bot activity, were frequently observed in comments from flagged accounts.  These keywords often related to politically charged topics, conspiracy theories, and divisive narratives.  While flagged accounts exhibited a numerically higher frequency of these bot-influence keywords compared to non-flagged accounts, the difference was not statistically significant in this analysis. This suggests that, based solely on keyword frequency, bots and humans in these subreddits may not differ substantially in their topical focus when analyzed with simple methods.
+*   **Keyword Analysis:** Figure 2 shows the word cloud generated by Google Gemini for the r/politics subreddit as an example. Keywords like "government," "election," "Democrats," and "Trump" are prominently featured, reflecting the politically charged nature of discussions in this subreddit. Keywords generated by Google Gemini for subreddits like r/politics and r/worldnews, which are known to be prone to bot activity, were frequently observed in comments from flagged accounts.  These keywords often related to politically charged topics, conspiracy theories, and divisive narratives.  While flagged accounts exhibited a numerically higher frequency of these bot-influence keywords compared to non-flagged accounts, the difference was not statistically significant in this analysis. This suggests that, based solely on keyword frequency, bots and humans in these subreddits may not differ substantially in their topical focus when analyzed with simple methods.
 
 **Figure 2: Word Cloud for /r/politics**
 
@@ -141,6 +125,26 @@ Exploratory quantitative evaluation using simple machine learning classifiers pr
 
 
 These quantitative results are preliminary and should be interpreted cautiously due to the lack of a true ground truth dataset and the limitations of relying solely on meta-metrics and basic content features. However, they provide initial evidence supporting the heuristic-based approach's potential for bot detection on Reddit and highlight areas for future refinement, particularly in reducing false positives and incorporating more sophisticated content-based features derived from labeled data.
+
+## Clustering Analysis
+
+To further explore the underlying structure of the user-level data and visually assess potential groupings, dimensionality reduction and clustering techniques were applied. Principal Component Analysis (PCA) was used to reduce the dimensionality of the user-level dataset to two principal components, allowing for visualization in a 2D space.  K-Means and DBSCAN clustering algorithms were then applied to the PCA-transformed data to identify potential clusters of users based on their features.
+
+Figure 4 displays scatter plots visualizing the results of K-Means and DBSCAN clustering, projected onto the first two principal components (PC1 and PC2).
+
+**Figure 4: K-Means and DBSCAN Clustering Visualizations**
+
+*(Figure 4: K-Means and DBSCAN Clustering Visualizations are inserted here - See Appendix B, Figures 10 and 11 in the original notebook)*
+
+*Note: The scatter plots visualize K-Means (top) and DBSCAN (bottom) clustering results after PCA dimensionality reduction. Points are colored by cluster assignment, and marker style indicates the 'Bot Category' assigned by heuristics. Axis labels indicate the top loading features for each Principal Component.*
+
+As shown in Figure 4, the visualizations reveal some degree of clustering in the user data, although distinct, well-separated clusters are not clearly evident.
+
+*   **K-Means Clustering:** The K-Means plot (top) shows a partitioning of the data into distinct clusters, but the clusters exhibit considerable overlap.  PC1, representing a combination of features like average comment length, content cosine similarity, and comment length, is plotted on the x-axis. PC2, representing features like em-dash presence, karma, and median seconds between comments, is plotted on the y-axis.  While K-Means forces data points into clusters, the visual overlap suggests that these clusters may not represent inherently distinct groups in terms of bot-like characteristics, and the algorithm may be imposing structure where clear separations do not naturally exist in the data based on these features alone.
+
+*   **DBSCAN Clustering:** The DBSCAN plot (bottom) identifies a central dense cluster (Cluster 0, shown in yellow) and designates a significant portion of data points as noise (Cluster -1, shown in purple), indicating that these points do not belong to any well-defined cluster based on DBSCAN's density-based criteria. Similar to K-Means, the axes represent PC1 and PC2 with the same feature loadings. The presence of a large noise cluster further supports the idea that clear, distinct groupings based on bot vs. human characteristics, as captured by these features and visualized in reduced dimensions, are not strongly present in the data.  The limited cluster structure suggests that bot and human accounts, as identified by heuristics and visualized through PCA, may exist on a spectrum of behavioral characteristics rather than in clearly separated categories, at least based on the features used for clustering and visualization.
+
+These clustering visualizations, while not revealing definitive bot clusters,  visually reinforce the idea that distinguishing between bots and humans based solely on the meta-metrics and basic content features used in this study is a complex task. The lack of clear cluster separation suggests that more nuanced, potentially content-aware, features and more sophisticated analytical techniques might be necessary to effectively identify and categorize bot activity on Reddit beyond the initial heuristic flagging.
 
 
 # Discussion and Conclusion
@@ -194,7 +198,7 @@ This study provides a preliminary exploration into the detection of bots on Redd
 
 # Appendices {.unnumbered .appendix}
 
-## Keyword Generation and Subreddit Selection Details
+## Keyword Generation and Subreddit Selection Details {.unnumbered .appendix}
 
 ```{python}
 #| echo: false
@@ -279,7 +283,9 @@ reddit = praw.Reddit(
     username=os.getenv("PRAW_USERNAME"),
     password=os.getenv("PRAW_PASSWORD")
 )
+```
 
+```{python}
 # Fetch a large subset of popular subreddits (large limit makes this representative of the largest overall subreddits by subscribers, check: https://gummysearch.com/tools/top-subreddits/)
 subreddits = list(reddit.subreddits.popular(limit=1000))
 
@@ -294,7 +300,6 @@ subs_df = pd.DataFrame([{
 
 # Print the top 10
 subs_df.head(10)
-
 ```
 
 ```{python}
@@ -339,7 +344,7 @@ top_vulnerable = subs_df.nlargest(50, 'Bot Score')[['Name', 'Subscribers', 'Subm
 top_vulnerable.head(10)
 ```
 
-## Figures and Tables
+## Figures and Tables {.unnumbered .appendix}
 
 **Figure 1: Word Cloud for /r/politics**
 *(See Appendix B, Figure 1 in the original notebook)*

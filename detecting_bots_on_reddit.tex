@@ -42,7 +42,7 @@
   \KOMAoptions{parskip=half}}
 \makeatother
 \usepackage{xcolor}
-\usepackage[top=1.5cm,bottom=3cm,hmargin=2.5cm]{geometry}
+\usepackage[top=1.5cm,bottom=2.5cm,hmargin=2.5cm]{geometry}
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \setcounter{secnumdepth}{5}
 % Make \paragraph and \subparagraph free-standing
@@ -663,14 +663,18 @@ displays a heatmap visualizing the cosine similarity of TF-IDF vectors
 generated from the combined text of comments within each of the top 5
 subreddits.
 
-\textbf{Figure 1: Cross-Subreddit Content Similarity Heatmap}
+\begin{figure}[H]
 
-\emph{(Figure 1: Cross-Subreddit Content Similarity Heatmap is inserted
-here - See Appendix B, Figure 9 in the original notebook)}
+{\centering \includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-28-output-1.pdf}
 
-\emph{Note: The heatmap visualizes the cosine similarity of TF-IDF
-vectors between the top 5 subreddits, with darker colors indicating
-higher similarity and lighter colors indicating lower similarity.}
+}
+
+\caption{Cross-Subreddit Content Similarity Heatmap: the heatmap
+visualizes the cosine similarity of TF-IDF vectors between the top 5
+subreddits, with darker colors indicating higher similarity and lighter
+colors indicating lower similarity.}
+
+\end{figure}%
 
 As shown in Figure 1, the heatmap reveals moderate content similarity
 between certain subreddits. \texttt{r/news} and \texttt{r/worldnews}
@@ -795,6 +799,77 @@ heuristic-based approach's potential for bot detection on Reddit and
 highlight areas for future refinement, particularly in reducing false
 positives and incorporating more sophisticated content-based features
 derived from labeled data.
+
+\subsection{Clustering Analysis}\label{clustering-analysis}
+
+To further explore the underlying structure of the user-level data and
+visually assess potential groupings, dimensionality reduction and
+clustering techniques were applied. Principal Component Analysis (PCA)
+was used to reduce the dimensionality of the user-level dataset to two
+principal components, allowing for visualization in a 2D space. K-Means
+and DBSCAN clustering algorithms were then applied to the
+PCA-transformed data to identify potential clusters of users based on
+their features.
+
+Figure 4 displays scatter plots visualizing the results of K-Means and
+DBSCAN clustering, projected onto the first two principal components
+(PC1 and PC2).
+
+\textbf{Figure 4: K-Means and DBSCAN Clustering Visualizations}
+
+\emph{(Figure 4: K-Means and DBSCAN Clustering Visualizations are
+inserted here - See Appendix B, Figures 10 and 11 in the original
+notebook)}
+
+\emph{Note: The scatter plots visualize K-Means (top) and DBSCAN
+(bottom) clustering results after PCA dimensionality reduction. Points
+are colored by cluster assignment, and marker style indicates the `Bot
+Category' assigned by heuristics. Axis labels indicate the top loading
+features for each Principal Component.}
+
+As shown in Figure 4, the visualizations reveal some degree of
+clustering in the user data, although distinct, well-separated clusters
+are not clearly evident.
+
+\begin{itemize}
+\item
+  \textbf{K-Means Clustering:} The K-Means plot (top) shows a
+  partitioning of the data into distinct clusters, but the clusters
+  exhibit considerable overlap. PC1, representing a combination of
+  features like average comment length, content cosine similarity, and
+  comment length, is plotted on the x-axis. PC2, representing features
+  like em-dash presence, karma, and median seconds between comments, is
+  plotted on the y-axis. While K-Means forces data points into clusters,
+  the visual overlap suggests that these clusters may not represent
+  inherently distinct groups in terms of bot-like characteristics, and
+  the algorithm may be imposing structure where clear separations do not
+  naturally exist in the data based on these features alone.
+\item
+  \textbf{DBSCAN Clustering:} The DBSCAN plot (bottom) identifies a
+  central dense cluster (Cluster 0, shown in yellow) and designates a
+  significant portion of data points as noise (Cluster -1, shown in
+  purple), indicating that these points do not belong to any
+  well-defined cluster based on DBSCAN's density-based criteria. Similar
+  to K-Means, the axes represent PC1 and PC2 with the same feature
+  loadings. The presence of a large noise cluster further supports the
+  idea that clear, distinct groupings based on bot vs.~human
+  characteristics, as captured by these features and visualized in
+  reduced dimensions, are not strongly present in the data. The limited
+  cluster structure suggests that bot and human accounts, as identified
+  by heuristics and visualized through PCA, may exist on a spectrum of
+  behavioral characteristics rather than in clearly separated
+  categories, at least based on the features used for clustering and
+  visualization.
+\end{itemize}
+
+These clustering visualizations, while not revealing definitive bot
+clusters, visually reinforce the idea that distinguishing between bots
+and humans based solely on the meta-metrics and basic content features
+used in this study is a complex task. The lack of clear cluster
+separation suggests that more nuanced, potentially content-aware,
+features and more sophisticated analytical techniques might be necessary
+to effectively identify and categorize bot activity on Reddit beyond the
+initial heuristic flagging.
 
 \section{Discussion and Conclusion}\label{discussion-and-conclusion}
 
@@ -1094,8 +1169,29 @@ R/7daystodie. (2025). In \emph{Reddit}.
 \section*{Appendices}\label{appendices}
 \addcontentsline{toc}{section}{Appendices}
 
-\subsection{Keyword Generation and Subreddit Selection
+\subsection*{Keyword Generation and Subreddit Selection
 Details}\label{keyword-generation-and-subreddit-selection-details}
+\addcontentsline{toc}{subsection}{Keyword Generation and Subreddit
+Selection Details}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Fetch a large subset of popular subreddits (large limit makes this representative of the largest overall subreddits by subscribers, check: https://gummysearch.com/tools/top{-}subreddits/)}
+\NormalTok{subreddits }\OperatorTok{=} \BuiltInTok{list}\NormalTok{(reddit.subreddits.popular(limit}\OperatorTok{=}\DecValTok{1000}\NormalTok{))}
+
+\CommentTok{\# Create a DataFrame using list comprehension for better performance}
+\NormalTok{subs\_df }\OperatorTok{=}\NormalTok{ pd.DataFrame([\{}
+    \StringTok{"Name"}\NormalTok{: subreddit.display\_name,}
+    \StringTok{"Subscribers"}\NormalTok{: subreddit.subscribers,}
+    \StringTok{"Description"}\NormalTok{: subreddit.public\_description,}
+    \StringTok{"Over 18"}\NormalTok{: subreddit.over18,}
+    \StringTok{"Submission Type"}\NormalTok{: subreddit.submission\_type}
+\NormalTok{\} }\ControlFlowTok{for}\NormalTok{ subreddit }\KeywordTok{in}\NormalTok{ subreddits]).sort\_values(by}\OperatorTok{=}\StringTok{"Subscribers"}\NormalTok{, ascending}\OperatorTok{=}\VariableTok{False}\NormalTok{, ignore\_index}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+
+\CommentTok{\# Print the top 10}
+\NormalTok{subs\_df.head(}\DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{longtable}[]{@{}llllll@{}}
 \toprule\noalign{}
@@ -1104,16 +1200,16 @@ Details}\label{keyword-generation-and-subreddit-selection-details}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-0 & funny & 66604745 & ... & False & any \\
-1 & AskReddit & 53167980 & ... & False & self \\
-2 & gaming & 46005332 & ... & False & any \\
-3 & worldnews & 44846984 & ... & False & link \\
-4 & todayilearned & 40125373 & ... & False & link \\
-5 & aww & 37645128 & ... & False & link \\
-6 & Music & 36991602 & ... & False & any \\
-7 & memes & 35397927 & ... & False & link \\
-8 & movies & 34851629 & ... & False & any \\
-9 & Showerthoughts & 34152909 & ... & False & self \\
+0 & funny & 66604854 & ... & False & any \\
+1 & AskReddit & 53169243 & ... & False & self \\
+2 & gaming & 46005690 & ... & False & any \\
+3 & worldnews & 44847466 & ... & False & link \\
+4 & todayilearned & 40125637 & ... & False & link \\
+5 & aww & 37645187 & ... & False & link \\
+6 & Music & 36991965 & ... & False & any \\
+7 & memes & 35397966 & ... & False & link \\
+8 & movies & 34851952 & ... & False & any \\
+9 & Showerthoughts & 34152969 & ... & False & self \\
 \end{longtable}
 
 \begin{Shaded}
@@ -1132,14 +1228,14 @@ Details}\label{keyword-generation-and-subreddit-selection-details}
 \begin{verbatim}
 news politics discussion war vaccines
 controversial conflict debate election government
-rights freedom censorship truth conspiracy
-agenda propaganda opinion ideology activism
-resistance revolution socialism capitalism communism
-nationalism globalism immigration border crime
-justice police law gun religion
-atheism gender race identity climate
-energy economy finance markets technology
-science health security military foreign policy
+russia china ukraine israel palestine
+climate immigration guns religion socialism
+capitalism feminism lgbt transgender race
+identity activism protest censorship freedom
+rights justice police crime law
+economy finance markets technology science
+health global world opinion truth
+facts bias propaganda conspiracy agenda
 \end{verbatim}
 
 \begin{Shaded}
@@ -1182,19 +1278,20 @@ science health security military foreign policy
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-0 & technology & 18519821 & link & 9 \\
-1 & IndiaSpeaks & 1049207 & any & 9 \\
-2 & pcmasterrace & 14764569 & any & 8 \\
-3 & TwoXChromosomes & 13637497 & any & 8 \\
-4 & politics & 8785302 & link & 8 \\
-5 & worldnews & 44846984 & link & 7 \\
-6 & movies & 34851629 & any & 7 \\
-7 & science & 33804287 & link & 7 \\
-8 & news & 29802178 & link & 7 \\
-9 & askscience & 26054518 & self & 7 \\
+0 & worldnews & 44847466 & link & 9 \\
+1 & technology & 18520150 & link & 9 \\
+2 & IndiaSpeaks & 1049211 & any & 9 \\
+3 & news & 29802412 & link & 8 \\
+4 & pcmasterrace & 14764738 & any & 8 \\
+5 & politics & 8785328 & link & 8 \\
+6 & movies & 34851952 & any & 7 \\
+7 & science & 33804429 & link & 7 \\
+8 & askscience & 26054520 & self & 7 \\
+9 & AmItheAsshole & 24117454 & self & 7 \\
 \end{longtable}
 
-\subsection{Figures and Tables}\label{figures-and-tables}
+\subsection*{Figures and Tables}\label{figures-and-tables}
+\addcontentsline{toc}{subsection}{Figures and Tables}
 
 \textbf{Figure 1: Word Cloud for /r/politics} \emph{(See Appendix B,
 Figure 1 in the original notebook)}
