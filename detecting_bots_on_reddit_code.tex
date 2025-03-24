@@ -136,6 +136,39 @@
 % Set default figure placement to htbp
 \def\fps@figure{htbp}
 \makeatother
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
 
 \usepackage{fvextra}
 \DefineVerbatimEnvironment{Highlighting}{Verbatim}{
@@ -190,7 +223,7 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same} % disable monospaced font for URLs
 \hypersetup{
-  pdftitle={Detecting Bots on Reddit},
+  pdftitle={Exploring Bot Detection on Reddit},
   pdfauthor={Matteo Mazzarelli},
   colorlinks=true,
   linkcolor={blue},
@@ -200,20 +233,26 @@
   pdfcreator={LaTeX via pandoc}}
 
 
-\title{Detecting Bots on Reddit}
+\title{Exploring Bot Detection on Reddit}
 \usepackage{etoolbox}
 \makeatletter
 \providecommand{\subtitle}[1]{% add subtitle to \maketitle
   \apptocmd{\@title}{\par {\large #1 \par}}{}{}
 }
 \makeatother
-\subtitle{Computational Social Science}
+\subtitle{Computational Social Science WS2024/25}
 \author{Matteo Mazzarelli}
-\date{March 23, 2025}
+\date{March 24, 2025}
 
 \begin{document}
 \maketitle
 
+\renewcommand*\contentsname{Table of contents}
+{
+\hypersetup{linkcolor=}
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
 
 \setstretch{1}
 \begin{Shaded}
@@ -2460,6 +2499,156 @@ Keywords: science, evolution, mental health, covid-19, pandemic, study, disorder
 \pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-29-output-5.pdf}}
 
 \pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-29-output-6.pdf}}
+
+\phantomsection\label{refs}
+\begin{CSLReferences}{1}{0}
+\bibitem[\citeproctext]{ref-botdetectionreddit}
+1. Hurtado S., Ray P., \& Marculescu R. (2019). Bot detection in reddit
+political discussion. \emph{ResearchGate}.
+\url{https://www.researchgate.net/publication/332340547_Bot_Detection_in_Reddit_Political_Discussion}
+
+\bibitem[\citeproctext]{ref-redditbotproblem}
+2. Dawson A. (2024). Does reddit have a bot problem? absolutely. In
+\emph{Lunio}. \url{https://www.lunio.ai/blog/reddit-bots}
+
+\bibitem[\citeproctext]{ref-redditbotwatch}
+3. R/botwatch. (2022). In \emph{Reddit}.
+\url{https://www.reddit.com/r/botwatch/}
+
+\bibitem[\citeproctext]{ref-multibotdetector}
+4. Ng L. H. X., \& Carley K. M. (2022). Assembling a multi-platform
+ensemble social bot detector with applications to US 2020 elections.
+\emph{arXiv}. \url{https://arxiv.org/html/2401.14607v1}
+
+\bibitem[\citeproctext]{ref-evalsocialbotmodels}
+5. Kutlu M., \& Selçuk A. A. (2025). Evaluation of social bot detection
+models. \emph{ResearchGate}.
+\url{https://www.researchgate.net/publication/361038547_Evaluation_of_social_bot_detection_models}
+
+\bibitem[\citeproctext]{ref-anomalycloudflare}
+6. Tang J. (2024). \emph{Lessons learned from scaling up cloudflare's
+anomaly detection platform}.
+\url{https://blog.cloudflare.com/lessons-learned-from-scaling-up-cloudflare-anomaly-detection-platform/}
+
+\bibitem[\citeproctext]{ref-anomalyf5networks}
+7. Tang J. (2024). How does anomaly detection work? : R/f5networks. In
+\emph{Reddit}.
+\url{https://www.reddit.com/r/f5networks/comments/13jw4qg/how_does_anomaly_detection_work/}
+
+\bibitem[\citeproctext]{ref-pushshiftredditdataset}
+8. Baumgartner J., Zannettou S., Keegan B., Squire M., \& Blackburn J.
+(2020). The pushshift reddit dataset. \emph{AAAI Publications}.
+\url{https://ojs.aaai.org/index.php/ICWSM/article/view/7347/7201}
+
+\bibitem[\citeproctext]{ref-redditcommentsdataset}
+9. Tkachenko V. (2021). Reddit comments dataset. In \emph{ClickHouse
+Docs}.
+\url{https://clickhouse.com/docs/getting-started/example-datasets/reddit-comments}
+
+\bibitem[\citeproctext]{ref-redditbotslearnusetalents}
+10. How to identify bots on reddit : R/LearnUselessTalents. (2023). In
+\emph{Reddit}.
+\url{https://www.reddit.com/r/LearnUselessTalents/comments/15tzjkb/how_to_identify_bots_on_reddit/}
+
+\bibitem[\citeproctext]{ref-botsidentifytyrannosnorlax}
+11. u/tyrannosnorlax. (2022). Bots. How to identify them, and why do
+they exist on reddit? In \emph{Reddit}.
+\url{https://www.reddit.com/user/tyrannosnorlax/comments/t0h466/bots_how_to_identify_them_and_why_do_they_exist/}
+
+\bibitem[\citeproctext]{ref-botproblem7daystodie}
+12. Bot problem - how to identify bot accounts (99\% accuracy) :
+R/7daystodie. (2025). In \emph{Reddit}.
+\url{https://www.reddit.com/r/7daystodie/comments/1au1g1s/bot_problem_how_to_identify_bot_accounts_99/}
+
+\bibitem[\citeproctext]{ref-originalityaiblog}
+13. Gillham J., \& Lambert M. (2023). \emph{Are you getting advice from
+a human or bot? Reddit shows spikes in AI content}.
+\url{https://originality.ai/blog/reddit-shows-spikes-in-ai-content}
+
+\bibitem[\citeproctext]{ref-nightwateremdash}
+14. Bush C. (2023). \emph{The em dash and AI: A conjunction - night
+water}. \url{https://www.nightwater.email/em-dash-ai/}
+
+\bibitem[\citeproctext]{ref-redditbotdetector}
+15. Tourond M. (2019). Reddit-bot-detector: A python bot that detects
+reddit bots. In \emph{GitHub}.
+\url{https://github.com/MatthewTourond/Reddit-Bot-Detector}
+
+\bibitem[\citeproctext]{ref-redditbotnetwork}
+16. Damasceno R. (2019). Identify-bots-reddit-comment-network:
+Characterization and classification of bots using only structural
+characteristics of the network. In \emph{GitHub}.
+\url{https://github.com/DamascenoRafael/identify-bots-reddit-comment-network}
+
+\bibitem[\citeproctext]{ref-mlredditbots}
+17. Skowronski J. (2019). Identifying trolls and bots on reddit with
+machine learning. In \emph{Medium}.
+\url{https://medium.com/towards-data-science/identifying-trolls-and-bots-on-reddit-with-machine-learning-709da5970af1}
+
+\bibitem[\citeproctext]{ref-breiman2001random}
+18. Breiman L. (2001). Random forests. \emph{Machine Learning},
+\emph{45}(1), 5--32. \url{https://doi.org/10.1023/A:1010933404324}
+
+\bibitem[\citeproctext]{ref-breiman1984classification}
+19. Breiman L., Friedman J. H., Olshen R. A., \& Stone C. J. (1984).
+\emph{Classification and regression trees}. Wadsworth International
+Group.
+
+\bibitem[\citeproctext]{ref-hutto2014vader}
+20. Hutto C. J., \& Gilbert E. (2014). \emph{VADER: A parsimonious
+rule-based model for sentiment analysis of social media text}.
+\url{http://comp.social.gatech.edu/papers/icwsm14.vader.hutto.pdf}
+
+\bibitem[\citeproctext]{ref-salton1988term}
+21. Salton G., \& Buckley C. (1988). Term-weighting approaches in
+automatic text retrieval. \emph{Information Processing \& Management},
+\emph{24}(5), 513--523.
+\url{https://doi.org/10.1016/0306-4573(88)90021-0}
+
+\bibitem[\citeproctext]{ref-cortes1995support}
+22. Cortes C., \& Vapnik V. (1995). Support-vector networks.
+\emph{Machine Learning}, \emph{20}(3), 273--297.
+\url{https://doi.org/10.1007/BF00994018}
+
+\bibitem[\citeproctext]{ref-lecun2015deep}
+23. LeCun Y., Bengio Y., \& Hinton G. (2015). Deep learning.
+\emph{Nature}, \emph{521}(7553), 436--444.
+\url{https://doi.org/10.1038/nature14539}
+
+\bibitem[\citeproctext]{ref-kincaid1975flesch}
+24. Kincaid J. P., Fishburne Jr R. P., Rogers R. L., \& Chissom B. S.
+(1975). \emph{Derivation of new readability formulas (automated
+readability index, fog count and flesch reading ease formula) for navy
+enlisted personnel}.
+
+\bibitem[\citeproctext]{ref-googleai2023gemini}
+25. Google. (2023). \emph{Gemini API}.
+\url{https://ai.google.dev/products/gemini}
+
+\bibitem[\citeproctext]{ref-praw2024}
+26. Reddit. (2024). \emph{{PRAW}: Python reddit API wrapper}.
+\url{https://praw.readthedocs.io/en/stable/}
+
+\bibitem[\citeproctext]{ref-hochreiter1997long}
+27. Hochreiter S., \& Schmidhuber J. (1997). Long short-term memory.
+\emph{Neural Computation}, \emph{9}(8), 1735--1780.
+\url{https://doi.org/10.1162/neco.1997.9.8.1735}
+
+\bibitem[\citeproctext]{ref-dietterich2000ensemble}
+28. Dietterich T. G. (2000). \emph{Ensemble methods in machine
+learning}. 1--15.
+
+\bibitem[\citeproctext]{ref-chandola2009anomaly}
+29. Chandola V., Banerjee A., \& Kumar V. (2009). Anomaly detection: A
+survey. \emph{ACM Computing Surveys (CSUR)}, \emph{41}(3), 1--58.
+\url{https://doi.org/10.1145/1541880.1541882}
+
+\bibitem[\citeproctext]{ref-goldstein2012histogram}
+30. Goldstein M., \& Dengel A. (2012). Histogram-based outlier score
+(HBOS): A fast unsupervised anomaly detection algorithm. \emph{KI-2012:
+Poster and Demo Track}, 59--63.
+
+\end{CSLReferences}
 
 
 

@@ -3,20 +3,28 @@ project:
     output-dir: docs
 title: Exploring Bot Detection on Reddit
 subtitle: Computational Social Science WS2024/25
-author: Matteo Mazzarelli
+author:
+    - name: Matteo Mazzarelli
+      email: Matteo.Mazzarelli@lmu.de
+      affiliation:
+        - name: Ludwig-Maximilians-Universität München
+classoption: abstract
+abstract-title: Abstract
+abstract: |
+    In the digital age, automated accounts or bots on social media platforms like Reddit pose a significant threat to online discourse. This paper investigates the efficacy of basic heuristic methods for detecting bot influence on Reddit discussions. Employing the Reddit API, we collected data from five high-traffic subreddits and applied a heuristic-based bot detection method utilizing meta-metrics such as account age, karma, posting frequency, content repetitiveness, and em-dash presence. Exploratory analysis using machine learning classifiers provided preliminary validation of the heuristic approach in identifying bot-like accounts based on these meta-metrics. However, keyword frequency and sentiment analysis, aided by Large Language Models, revealed no statistically significant content-based differences between accounts flagged as potential bots and non-flagged accounts, suggesting bots are increasingly capable of mimicking human language at a surface level. While heuristics effectively flagged accounts exhibiting bot-like behavior, they proved insufficient for content-based bot identification without further nuanced analysis. This study highlights the limitations of relying solely on meta-metrics and basic content analysis for bot detection, underscoring the necessity for future research to incorporate human-validated content labeling and advanced machine learning techniques capable of discerning subtle linguistic cues in bot-generated text. The development of content-aware bot detection methods is crucial for maintaining the integrity of online discussions on platforms like Reddit.
 date: today
 date-format: long
 format:
-    pdf:
+    PrettyPDF-pdf:
         number-sections: true
-        toc: true
+        toc: false
         include-in-header: extra/preamble.tex
         fontsize: 12pt
         linestretch: 1
-        geometry:
-            - top=1.5cm
-            - bottom=2.5cm
-            - hmargin=2.5cm
+        # geometry:
+        #     - top=1.5cm
+        #     - bottom=3cm
+        #     - hmargin=2.5cm
         link-citations: true
         keep-tex: true
         # pdf-engine: latexmk

@@ -7,7 +7,8 @@
   12pt,
   letterpaper,
   DIV=11,
-  numbers=noendperiod]{scrartcl}
+  numbers=noendperiod,
+  abstract]{scrartcl}
 
 \usepackage{amsmath,amssymb}
 \usepackage{setspace}
@@ -42,7 +43,6 @@
   \KOMAoptions{parskip=half}}
 \makeatother
 \usepackage{xcolor}
-\usepackage[top=1.5cm,bottom=2.5cm,hmargin=2.5cm]{geometry}
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \setcounter{secnumdepth}{5}
 % Make \paragraph and \subparagraph free-standing
@@ -170,6 +170,83 @@
 \newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
 \newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
 
+% load packages
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{eso-pic}
+\usepackage{fancyhdr}
+\usepackage{sectsty}
+\usepackage{fontspec}
+\usepackage{titlesec}
+
+%% Set page size with a wider right margin
+\geometry{a4paper, total={170mm,257mm}, left=20mm, top=20mm, bottom=20mm, right=50mm}
+
+%% Let's define some colours
+\definecolor{light}{HTML}{E6E6E7}
+\definecolor{highlight}{HTML}{00883A}
+\definecolor{dark}{HTML}{345442}
+
+%% Let's add the border on the right hand side 
+\AddToShipoutPicture{% 
+    \AtPageLowerLeft{% 
+        \put(\LenToUnit{\dimexpr\paperwidth-3cm},0){% 
+            \color{light}\rule{3cm}{\LenToUnit\paperheight}%
+          }%
+     }%
+     % logo
+    \AtPageLowerLeft{% start the bar at the bottom right of the page
+        \put(\LenToUnit{\dimexpr\paperwidth-2.25cm},27.2cm){% move it to the top right
+            \color{light}\includegraphics[width=2cm]{_extensions/nrennie/PrettyPDF/logo.png}
+          }%
+     }%
+}
+
+%% Style the page number
+\fancypagestyle{mystyle}{
+  \fancyhf{}
+  \renewcommand\headrulewidth{0pt}
+  \fancyfoot[R]{\thepage}
+  \fancyfootoffset{3.5cm}
+}
+\setlength{\footskip}{20pt}
+
+%% style the chapter/section fonts
+\chapterfont{\color{dark}\fontsize{20}{16.8}\selectfont}
+\sectionfont{\color{dark}\fontsize{20}{16.8}\selectfont}
+\subsectionfont{\color{dark}\fontsize{14}{16.8}\selectfont}
+\titleformat{\subsection}
+  {\sffamily\Large\bfseries}{\thesection}{1em}{}[{\titlerule[0.8pt]}]
+  
+% left align title
+\makeatletter
+\renewcommand{\maketitle}{\bgroup\setlength{\parindent}{0pt}
+\begin{flushleft}
+  {\sffamily\huge\textbf{\MakeUppercase{\@title}}} \vspace{0.3cm} \newline
+  {\Large {\@subtitle}} \newline
+  \@author
+\end{flushleft}\egroup
+}
+\makeatother
+
+%% Use some custom fonts
+\setsansfont{Ubuntu}[
+    Path=_extensions/nrennie/PrettyPDF/Ubuntu/,
+    Scale=0.9,
+    Extension = .ttf,
+    UprightFont=*-Regular,
+    BoldFont=*-Bold,
+    ItalicFont=*-Italic,
+    ]
+
+\setmainfont{Ubuntu}[
+    Path=_extensions/nrennie/PrettyPDF/Ubuntu/,
+    Scale=0.9,
+    Extension = .ttf,
+    UprightFont=*-Regular,
+    BoldFont=*-Bold,
+    ItalicFont=*-Italic,
+    ]
 \usepackage{fvextra}
 \DefineVerbatimEnvironment{Highlighting}{Verbatim}{
     commandchars=\\\{\},
@@ -217,6 +294,18 @@
 \@ifpackageloaded{caption}{}{\usepackage{caption}}
 \@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
 \makeatother
+\makeatletter
+\@ifpackageloaded{tcolorbox}{}{\usepackage[skins,breakable]{tcolorbox}}
+\makeatother
+\makeatletter
+\@ifundefined{shadecolor}{\definecolor{shadecolor}{rgb}{.97, .97, .97}}{}
+\makeatother
+\makeatletter
+\@ifundefined{codebgcolor}{\definecolor{codebgcolor}{named}{light}}{}
+\makeatother
+\makeatletter
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[frame hidden, breakable, colback={codebgcolor}, sharp corners, enhanced, boxrule=0pt]}{\end{tcolorbox}}\fi
+\makeatother
 
 \usepackage{bookmark}
 
@@ -226,10 +315,10 @@
   pdftitle={Exploring Bot Detection on Reddit},
   pdfauthor={Matteo Mazzarelli},
   colorlinks=true,
-  linkcolor={blue},
+  linkcolor={highlight},
   filecolor={Maroon},
   citecolor={Blue},
-  urlcolor={Blue},
+  urlcolor={highlight},
   pdfcreator={LaTeX via pandoc}}
 
 
@@ -246,15 +335,41 @@
 
 \begin{document}
 \maketitle
+\begin{abstract}
+In the digital age, automated accounts or bots on social media platforms
+like Reddit pose a significant threat to online discourse. This paper
+investigates the efficacy of basic heuristic methods for detecting bot
+influence on Reddit discussions. Employing the Reddit API, we collected
+data from five high-traffic subreddits and applied a heuristic-based bot
+detection method utilizing meta-metrics such as account age, karma,
+posting frequency, content repetitiveness, and em-dash presence.
+Exploratory analysis using machine learning classifiers provided
+preliminary validation of the heuristic approach in identifying bot-like
+accounts based on these meta-metrics. However, keyword frequency and
+sentiment analysis, aided by Large Language Models, revealed no
+statistically significant content-based differences between accounts
+flagged as potential bots and non-flagged accounts, suggesting bots are
+increasingly capable of mimicking human language at a surface level.
+While heuristics effectively flagged accounts exhibiting bot-like
+behavior, they proved insufficient for content-based bot identification
+without further nuanced analysis. This study highlights the limitations
+of relying solely on meta-metrics and basic content analysis for bot
+detection, underscoring the necessity for future research to incorporate
+human-validated content labeling and advanced machine learning
+techniques capable of discerning subtle linguistic cues in bot-generated
+text. The development of content-aware bot detection methods is crucial
+for maintaining the integrity of online discussions on platforms like
+Reddit.
+\end{abstract}
 
-\renewcommand*\contentsname{Table of contents}
-{
-\hypersetup{linkcolor=}
-\setcounter{tocdepth}{3}
-\tableofcontents
-}
+\pagestyle{mystyle}
+
 
 \setstretch{1}
+\newpage
+
+\tableofcontents
+
 \newpage
 
 \section{Introduction}\label{introduction}
@@ -453,7 +568,11 @@ collected included:
 \item
   \textbf{User Data:} For each comment author, publicly available user
   data such as account age (in days) and combined karma score (comment
-  and link karma) were collected.
+  and link karma) were collected. Furthermore, to establish user
+  behavior, the 10 most recent comments at the time of collection made
+  by each of the users present in the comments dataset were sourced
+  through the API. This allowed us to compute content similarity and
+  posting frequency.
 \end{itemize}
 
 To manage data volume and processing time, as well as to respect API
@@ -512,8 +631,8 @@ heuristics triggered. Accounts exceeding a certain threshold on the
 ``Bot Score'' were classified as ``possible bots'' or ``very likely
 bots'' allowing for varying degrees of bot likelihood assessment. It is
 important to note that these heuristics primarily rely on meta-metrics
-and basic content features like punctuation, and do not deeply analyze
-the semantic content of the comments themselves.
+and basic content features, and do not deeply analyze the semantic
+content of the comments themselves.
 
 \textbf{Polarization:} A basic measure of polarization was added using
 sentiment analysis of comment content. The VADER (Valence Aware
@@ -732,15 +851,14 @@ Gemini LLM based on a large sample of comments from the subreddit.}
 \item
   \textbf{Sentiment Analysis:} Sentiment analysis using VADER revealed
   subtle differences in the average sentiment polarity of comments from
-  flagged and non-flagged accounts. While both groups exhibited a
-  generally negative sentiment, comments from flagged accounts showed a
-  slightly more pronounced negative sentiment on average, particularly
-  in politically polarized subreddits. However, similar to keyword
+  flagged and non-flagged accounts. However, similar to keyword
   analysis, this difference in average sentiment was not statistically
   significant. This indicates that, based on sentiment scores alone,
   distinguishing between bot and human comments remains challenging with
   basic sentiment analysis tools, suggesting bots may be capable of
-  mimicking human sentiment expression to some extent.
+  mimicking human sentiment expression to some extent, especially in an
+  age where state of the art human-like text generation has an extremely
+  low barrier of access.
 \end{itemize}
 
 The lack of statistically significant differences in keyword frequencies
@@ -922,20 +1040,36 @@ using machine learning classifiers provided preliminary support for the
 predictive capability of the heuristic-based approach when relying on
 these meta-metrics and basic content features.
 
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-25-output-1.pdf}
+
+}
+
+\caption{\label{fig-comparison}Simple metrics indicating lack of
+significant differences between users labeled as likely humans
+vs.~possible or likely bots. The text readability measure can be further
+explored in the code file or in its original source
+paper\textsuperscript{{[}\citeproc{ref-kincaid1975flesch}{30}{]}}.}
+
+\end{figure}%
+
 However, and importantly, the analysis of keyword frequencies and
 sentiment scores did \emph{not} reveal statistically significant
-differences between flagged and non-flagged accounts. This key finding
-suggests that, while heuristic methods based on meta-metrics can
-identify certain bot-like accounts, these bots may be increasingly
-sophisticated in mimicking human language in terms of topical focus and
-sentiment expression, at least when analyzed using simple keyword
-frequency and sentiment analysis tools. This highlights a crucial
-limitation of relying solely on meta-metrics and basic content analysis
-for bot detection in the face of increasingly advanced automated
-accounts. It also suggests that simply analyzing keyword frequencies or
-overall sentiment polarity may not be sufficient to distinguish bots
-from humans in terms of content, and more nuanced, context-aware content
-analysis methods are needed.
+differences between flagged and non-flagged accounts (see
+Figure~\ref{fig-comparison}). This key finding suggests that, while
+heuristic methods based on meta-metrics can identify certain bot-like
+accounts, these bots may be increasingly sophisticated in mimicking
+human language in terms of topical focus and sentiment expression, at
+least when analyzed using simple keyword frequency and sentiment
+analysis tools. This highlights a crucial limitation of relying solely
+on meta-metrics and basic content analysis for bot detection in the face
+of increasingly advanced automated accounts. It also suggests that
+simply analyzing keyword frequencies or overall sentiment polarity may
+not be sufficient to distinguish bots from humans in terms of content,
+and more nuanced, context-aware content analysis methods are needed.
 
 The study also investigated potential narrative amplification and
 polarization associated with flagged accounts. While suggestive evidence
@@ -980,17 +1114,19 @@ interpreting the findings:
 \item
   \textbf{Lack of Ground Truth and Content Labeling:} The absence of a
   true ``ground truth'' dataset for bot identification on Reddit poses a
-  significant challenge for rigorous quantitative evaluation. Moreover,
-  the study did not incorporate a crucial element for content-based bot
-  detection: labeled data where comment bodies are categorized as
-  bot-generated or human-generated. The exploratory machine learning
-  evaluation provides only a preliminary indication of the heuristic
-  approach's predictive capability based on meta-metrics but cannot
-  definitively assess its accuracy against a verified bot/human
-  classification that incorporates content analysis. Future research
-  must prioritize the creation of such labeled datasets, potentially
-  through human annotation or LLM-assisted labeling, to enable the
-  development of more robust content-aware bot detection models.
+  significant challenge for rigorous quantitative evaluation. In none of
+  the previous studies, a reasonably accurate bot detection method based
+  on well-labeled data was found. Moreover, the study did not
+  incorporate a crucial element for content-based bot detection: labeled
+  data where comment bodies are categorized as bot-generated or
+  human-generated. The exploratory machine learning evaluation provides
+  only a preliminary indication of the heuristic approach's predictive
+  capability based on meta-metrics but cannot definitively assess its
+  accuracy against a verified bot/human classification that incorporates
+  content analysis. Future research must prioritize the creation of such
+  labeled datasets, potentially through human annotation or LLM-assisted
+  labeling, to enable the development of more robust content-aware bot
+  detection models.
 \item
   \textbf{Data Sampling:} The data collection was limited to the top 50
   hottest posts per subreddit and a maximum of 2000 comments per post.
@@ -1047,8 +1183,7 @@ meta-metrics and incorporating content-based analysis:
 \item
   \textbf{Advanced Machine Learning Models for Content-Aware Bot
   Detection:} Future studies should investigate the application of more
-  advanced machine learning models, including deep learning
-  architectures and graph neural networks, trained on datasets with
+  advanced machine learning models, trained on datasets with
   human-validated content labels, for Reddit bot detection. These
   models, capable of processing and understanding natural language, may
   be better suited to capture the complex behavioral and linguistic
@@ -1069,22 +1204,6 @@ meta-metrics and incorporating content-based analysis:
   labeled data, creating a more robust and nuanced bot detection system
   that leverages the strengths of both rule-based and data-driven
   approaches.
-\item
-  \textbf{Real-time Bot Detection Systems with Content Analysis
-  Capabilities and Ethical Considerations:} Developing real-time bot
-  detection systems that can proactively identify and flag malicious
-  activity on Reddit is a crucial direction for future work. This would
-  require efficient and scalable algorithms capable of processing large
-  volumes of streaming Reddit data and incorporating sophisticated
-  content analysis in real-time, potentially through optimized and
-  ethically vetted LLM-based feature extraction or lightweight content
-  classification models, while also carefully addressing the
-  computational cost, latency considerations, and ethical implications
-  of real-time content processing and automated bot flagging. Ethical
-  considerations, particularly regarding potential biases in content
-  labels and algorithmic detection, and the need for transparency and
-  user recourse mechanisms in content-based bot detection systems, must
-  be central to future development.
 \end{itemize}
 
 \subsection{Conclusion}\label{conclusion}
@@ -1501,17 +1620,6 @@ Sentiment Analysis}
 \subsection*{Additional Figures}\label{additional-figures}
 \addcontentsline{toc}{subsection}{Additional Figures}
 
-\begin{figure}[H]
-
-{\centering \pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-27-output-1.pdf}}
-
-}
-
-\caption{Average Compound Sentiment Scores by subreddit. Higher score
-indicates a more positive sentiment.}
-
-\end{figure}%
-
 \begin{figure}
 
 \begin{minipage}{0.50\linewidth}
@@ -1595,15 +1703,12 @@ Word Cloud generation.}
 
 \begin{figure}[H]
 
-{\centering \pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-25-output-1.pdf}}
+{\centering \pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-27-output-1.pdf}}
 
 }
 
-\caption{Simple metrics indicating lack of significant differences
-between users labeled as likely humans vs.~possible or likely bots. The
-text readability measure can be further explored in the code file or in
-its original source
-paper\textsuperscript{{[}\citeproc{ref-kincaid1975flesch}{30}{]}}.}
+\caption{Average Compound Sentiment Scores by subreddit. Higher score
+indicates a more positive sentiment.}
 
 \end{figure}%%
 \begin{figure}[H]
