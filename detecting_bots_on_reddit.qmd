@@ -1,3 +1,5 @@
+\newpage
+
 # Introduction
 
 The pervasive presence of automated accounts, or bots, on social media platforms has become a significant concern in the digital age. These bots, designed to mimic human users, can manipulate online discussions, disseminate misinformation, and potentially influence public opinion, thus posing a threat to the integrity of online communities [@botdetectionreddit]. Reddit, a platform structured around user-created communities known as subreddits, is not immune to this issue. In fact, the platform's history even includes the deliberate use of fake accounts to simulate activity and attract genuine users, highlighting a long-standing awareness of the impact of artificial engagement [@redditbotproblem]. As bot technology becomes increasingly sophisticated, driven by advancements in artificial intelligence, the need for effective detection methods is more critical than ever [@botdetectionreddit]. This paper investigates the detection of bots on Reddit, exploring the efficacy of heuristic-based methods and the potential of large language models (LLMs) to aid in this complex task.
@@ -11,9 +13,9 @@ This question is relevant for several reasons. Firstly, understanding the extent
 
 The detection of bots on social media platforms is an area of increasing scholarly attention, driven by the growing recognition of bots' potential to manipulate online discourse and influence public opinion [@multibotdetector].  Existing research in this field has primarily focused on platforms like Twitter, examining a range of features and methodologies for identifying automated accounts [@redditbotwatch].
 
-One prominent area of research involves the use of machine learning for bot detection. Studies have explored various algorithms, including tree-based classifiers like Random Forests and Decision Trees, as well as more complex deep learning models such as Long Short-Term Memory (LSTM) networks [@evalsocialbotmodels; @multibotdetector]. These approaches typically rely on a combination of features, encompassing user metadata, activity patterns, and content characteristics, to classify accounts as either bots or humans. For instance, ensemble methods, which combine multiple classifiers, have demonstrated promising results in multi-platform bot detection, achieving notable accuracy rates [@multibotdetector; @multibotdetector].
+One prominent area of research involves the use of machine learning for bot detection. Studies have explored various algorithms, including tree-based classifiers like Random Forests [@breiman2001random] and Decision Trees [@breiman1984classification], as well as more complex deep learning models such as Long Short-Term Memory (LSTM) networks [@evalsocialbotmodels; @multibotdetector; @hochreiter1997long]. These approaches typically rely on a combination of features, encompassing user metadata, activity patterns, and content characteristics, to classify accounts as either bots or humans. For instance, ensemble methods [@dietterich2000ensemble], which combine multiple classifiers, have demonstrated promising results in multi-platform bot detection, achieving notable accuracy rates [@multibotdetector; @multibotdetector].
 
-Another significant research direction focuses on anomaly detection techniques, which aim to identify accounts exhibiting behaviors that deviate significantly from typical human user patterns [@anomalycloudflare; @anomalyf5networks]. These unsupervised learning methods are particularly valuable for detecting novel bot behaviors that may not be captured by supervised learning models trained on pre-labeled data. Histogram-Based Outlier Scoring (HBOS) is one such algorithm that has been applied to scalable anomaly detection in large datasets, demonstrating its potential for identifying unusual activity patterns indicative of bot behavior [@anomalycloudflare].
+Another significant research direction focuses on anomaly detection techniques, which aim to identify accounts exhibiting behaviors that deviate significantly from typical human user patterns [@anomalycloudflare; @anomalyf5networks; @chandola2009anomaly]. These unsupervised learning methods are particularly valuable for detecting novel bot behaviors that may not be captured by supervised learning models trained on pre-labeled data. Histogram-Based Outlier Scoring (HBOS) [@goldstein2012histogram] is one such algorithm that has been applied to scalable anomaly detection in large datasets, demonstrating its potential for identifying unusual activity patterns indicative of bot behavior [@anomalycloudflare].
 
 While a substantial body of research exists on bot detection in social media, fewer studies have specifically focused on Reddit [@botdetectionreddit; @redditbotnetwork; @mlredditbots]. Reddit's unique structure, characterized by topic-specific subreddits and community-driven moderation, presents both distinct challenges and opportunities for bot detection. Research focusing on Reddit has begun to explore platform-specific features, such as user interaction networks within subreddits, to identify bot activity [@redditbotnetwork].  Furthermore, studies have investigated the role of bots in specific contexts on Reddit, such as political discussions and the dissemination of misinformation [@botdetectionreddit; @multibotdetector].
 
@@ -27,9 +29,9 @@ In summary, previous predictive research on bot detection has established a soli
 
 ## Data
 
-The data for this study was collected using the Reddit API via the Python Reddit API Wrapper (PRAW). The final data collection period spanned March 21 and 22, 2025.  The unit of analysis is individual Reddit comments, as well as the users posting them.
+The data for this study was collected using the Reddit API via the Python Reddit API Wrapper (PRAW) [@praw2024]. The final data collection period spanned March 21 and 22, 2025.  The unit of analysis is individual Reddit comments, as well as the users posting them.
 
-**Subreddit Selection:** Subreddits were selected based on their high subscriber counts and relevance to topics frequently targeted by bots, such as politics and news. To ensure a reproducible and systematic subreddit selection, keywords were generated using Google Gemini, a large language model API. The prompt provided to Gemini requested keywords associated with controversial topics likely to attract bot activity. (See Appendix A.1 for the prompt and code used for keyword generation).  Based on these keywords and subscriber counts, a scoring system was developed to rank subreddits by their potential vulnerability to bot influence. (See Appendix A.2 for the scoring system and selected subreddits). The top 10 subreddits according to this scoring system were initially considered. For in-depth analysis and LLM querying, 5 subreddits with high bot influence scores were chosen: r/worldnews, r/news, r/politics, r/science, and r/technology, as they are representative of discussion topics that are likely to be targeted by bots.
+**Subreddit Selection:** Subreddits were selected based on their high subscriber counts and relevance to topics frequently targeted by bots, such as politics and news. To ensure a reproducible and systematic subreddit selection, keywords were generated using Google Gemini [@googleai2023gemini], a large language model API. The prompt provided to Gemini requested keywords associated with controversial topics likely to attract bot activity. (See the Appendix for the prompt and code used for keyword generation).  Based on these keywords and subscriber counts, a scoring system was developed to rank subreddits by their potential vulnerability to bot influence. (See the Appendix for the scoring system and selected subreddits). The top 10 subreddits according to this scoring system were initially considered. For in-depth analysis and LLM querying, 5 subreddits with high bot influence scores were chosen: r/worldnews, r/news, r/politics, r/science, and r/technology, as they are representative of discussion topics that are likely to be targeted by bots.
 
 **Data Collection Procedure:** For each selected subreddit, the Reddit API was used to collect posts and associated comments. The data collected included:
 
@@ -47,12 +49,13 @@ To manage data volume and processing time, as well as to respect API limitations
 *   **Young Account Age:** Accounts less than a week old were considered potentially bot-like.
 *   **Unusual Karma:** Accounts with unusually low or high karma scores relative to their activity were flagged. Thresholds for "unusual" were empirically determined based on the data distribution.
 *   **High Posting Frequency:** Accounts with exceptionally high posting frequency, commenting multiple times within unusually short time intervals, were considered suspicious.
-*   **Repetitive Content:**  Accounts frequently posting or commenting with highly similar or identical text were flagged for repetitive content. Cosine similarity of comment text was used to quantify content repetition.
-*   **Em-dash Presence:**  The presence of em-dashes (—) in comments was considered as a potential indicator of AI-generated content, as some AI models tend to overuse this punctuation mark, which is not usually present in human writing due to its difficulty in being typed on a normal keyboard [@redditbotdetector; @originalityaiblog; @nightwateremdash].
+*   **Speed of Commenting:** Accounts commenting on posts (or replying to parent comments made by different users) in an unlikely-to-be-human quick fashion are flagged as likely to be bots.
+*   **Repetitive Content:** Accounts frequently posting or commenting with highly similar or identical text were flagged for repetitive content. Cosine similarity of comment text was used to quantify content repetition.
+*   **Em-dash Presence:** The presence of em-dashes (—) in comments was considered as a potential indicator of AI-generated content, as some AI models tend to overuse this punctuation mark, which is not usually present in human writing due to its difficulty in being typed on a normal keyboard [@redditbotdetector; @originalityaiblog; @nightwateremdash].
 
-These heuristics were chosen based on common bot characteristics identified in previous research and community discussions on Reddit [@redditbotslearnusetalents; @botsidentifytyrannosnorlax; @botproblem7daystodie], and incorporating recent observations about AI-generated text markers [@redditbotdetector; @originalityaiblog; @nightwateremdash]. A "Bot Score" was calculated for each account based on the number of heuristics triggered. Accounts exceeding a certain threshold on the "Bot Score" were classified as "possible bots" or "very likely bots" allowing for varying degrees of bot likelihood assessment. It is important to note that these heuristics primarily rely on meta-metrics and basic content features like punctuation, and do not deeply analyze the semantic content of the comments themselves.
+These heuristics were chosen based on common bot characteristics identified in previous research and community discussions on Reddit [@redditbotslearnusetalents; @botsidentifytyrannosnorlax; @botproblem7daystodie], and incorporating recent observations about AI-generated text markers [@redditbotdetector; @originalityaiblog; @nightwateremdash]. A "Bot Score" was calculated for each account based on the number of heuristics triggered. Accounts exceeding a certain threshold on the "Bot Score" were classified as "possible bots" or "very likely bots" allowing for varying degrees of bot likelihood assessment. It is important to note that these heuristics primarily rely on meta-metrics and basic content features, and do not deeply analyze the semantic content of the comments themselves.
 
-**Polarization:** Polarization was assessed using sentiment analysis of comment content. The VADER (Valence Aware Dictionary and sEntiment Reasoner) sentiment analysis tool was employed to calculate compound sentiment scores for comments. Average sentiment scores were compared between comments from accounts flagged as potential bots and those from non-flagged accounts to identify potential differences in sentiment polarity, which could indicate bot-driven polarization.
+**Polarization:** A basic measure of polarization was added using sentiment analysis of comment content. The VADER (Valence Aware Dictionary and sEntiment Reasoner) [@hutto2014vader] sentiment analysis tool was employed to calculate compound sentiment scores for comments. Average sentiment scores were compared between comments from accounts flagged as potential bots and those from non-flagged accounts to identify potential differences in sentiment polarity, which could indicate bot-driven polarization.
 
 ## Models
 
@@ -69,7 +72,7 @@ The LLM's output was then parsed to extract the keyword list and sentiment summa
 
 *   **Qualitative Evaluation:**  A manual review of accounts flagged as potential bots was conducted to assess the face validity of the heuristics and examine the characteristics of flagged accounts. Subreddit-specific word clouds generated from LLM keyword extraction were analyzed to understand the thematic focus of discussions and potentially identify bot-driven narratives. Sentiment summaries provided by the LLM were evaluated for their coherence and consistency with the overall tone of subreddit discussions.
 
-*   **Quantitative Evaluation (Exploratory):** To explore the potential for quantitative evaluation, simple classification models (Random Forest, SVM, Neural Network, all left untuned) were trained using features derived from the heuristic analysis (Bot Score, account age, karma, posting frequency, content repetitiveness, em-dash presence, etc.).  The performance of these models was assessed using standard classification metrics. This quantitative evaluation was exploratory, given the lack of a true "ground truth" dataset for bot identification in this study and the limitation of relying solely on meta-metrics and basic content features without labeled content data. It aimed to provide a preliminary indication of the heuristic-based approach's predictive capability and guide future research directions involving more rigorous machine learning evaluation that incorporates content-based features from labeled data.
+*   **Quantitative Evaluation (Exploratory):** To explore the potential for quantitative evaluation, simple classification models (Random Forest [@breiman2001random], SVMs [@cortes1995support], Neural Network [@lecun2015deep], all left untuned) were trained using features derived from the heuristic analysis (Bot Score, account age, karma, posting frequency, content repetitiveness, em-dash presence, etc.).  The performance of these models was assessed using standard classification metrics. This quantitative evaluation was exploratory, given the lack of a true "ground truth" dataset for bot identification in this study and the limitation of relying solely on meta-metrics and basic content features without labeled content data. It aimed to provide a preliminary indication of the heuristic-based approach's predictive capability and guide future research directions involving more rigorous machine learning evaluation that incorporates content-based features from labeled data.
 
 ## Reproducibility
 
@@ -90,22 +93,19 @@ The heuristic-based method, designed to flag accounts based on pre-defined meta-
 
 ## Cross-Subreddit Content Similarity and Narrative Amplification
 
-To understand the relationships between the top subreddits in terms of content, and to explore potential narrative amplification, a cross-subreddit content similarity analysis was conducted. Figure 1 displays a heatmap visualizing the cosine similarity of TF-IDF vectors generated from the combined text of comments within each of the top 5 subreddits.
+To understand the relationships between the top subreddits in terms of content, and to explore potential narrative amplification, a cross-subreddit content similarity analysis was conducted. @fig-cross displays a heatmap visualizing the cosine similarity of TF-IDF vectors [@salton1988term] generated from the combined text of comments within each of the top 5 subreddits.
 
-![Cross-Subreddit Content Similarity Heatmap: the heatmap visualizes the cosine similarity of TF-IDF vectors between the top 5 subreddits, with darker colors indicating higher similarity and lighter colors indicating lower similarity.](detecting_bots_on_reddit_code_files/figure-pdf/cell-28-output-1.pdf){width=100%}
+As shown in @fig-cross, the heatmap reveals moderate content similarity between certain subreddits.  r/news and r/worldnews exhibit one of the highest content similarities (0.81), which is expected given their overlapping topical focus on current events.  r/politics also shows relatively high similarity with r/news (0.80) and r/worldnews (0.72), indicating thematic connections between political discussions and news reporting.  r/technology and r/science show lower similarity with the news and politics subreddits, reflecting their distinct subject matter.  r/science and r/technology exhibit moderate similarity to each other (0.63). This suggests a thematic clustering where news and politics subreddits are more closely related in content, while technology and science form a separate, though somewhat related, cluster.  Bots operating across these subreddits might exploit these thematic connections to amplify narratives across related communities.
 
-As shown in Figure 1, the heatmap reveals moderate content similarity between certain subreddits.  r/news and r/worldnews exhibit one of the highest content similarities (0.81), which is expected given their overlapping topical focus on current events.  r/politics also shows relatively high similarity with r/news (0.80) and r/worldnews (0.72), indicating thematic connections between political discussions and news reporting.  r/technology and r/science show lower similarity with the news and politics subreddits, reflecting their distinct subject matter.  r/science and r/technology exhibit moderate similarity to each other (0.63). This suggests a thematic clustering where news and politics subreddits are more closely related in content, while technology and science form a separate, though somewhat related, cluster.  Bots operating across these subreddits might exploit these thematic connections to amplify narratives across related communities.
+![Cross-Subreddit Content Similarity Heatmap: the heatmap visualizes the cosine similarity of TF-IDF vectors between the top 5 subreddits, with darker colors indicating higher similarity and lighter colors indicating lower similarity.](detecting_bots_on_reddit_code_files/figure-pdf/cell-28-output-1.pdf){#fig-cross width=85%}
 
 Analysis of keyword frequencies and sentiment scores provided further insights into potential narrative amplification and polarization associated with flagged accounts.
 
-*   **Keyword Analysis:** Figure 2 shows the word cloud generated by Google Gemini for the r/politics subreddit as an example. Keywords like "government," "election," "Democrats," and "Trump" are prominently featured, reflecting the politically charged nature of discussions in this subreddit. Keywords generated by Google Gemini for subreddits like r/politics and r/worldnews, which are known to be prone to bot activity, were frequently observed in comments from flagged accounts.  These keywords often related to politically charged topics, conspiracy theories, and divisive narratives.  While flagged accounts exhibited a numerically higher frequency of these bot-influence keywords compared to non-flagged accounts, the difference was not statistically significant in this analysis. This suggests that, based solely on keyword frequency, bots and humans in these subreddits may not differ substantially in their topical focus when analyzed with simple methods.
+*   **Keyword Analysis:** @fig-polwc shows the word cloud generated by Google Gemini for the r/politics subreddit as an example. Keywords like "government," "election," "Democrats," and "Trump" are prominently featured, reflecting the politically charged nature of discussions in this subreddit. Keywords generated by Google Gemini for subreddits like r/politics and r/worldnews, which are known to be prone to bot activity, were frequently observed in comments from flagged accounts.  These keywords often related to politically charged topics, conspiracy theories, and divisive narratives.  While flagged accounts exhibited a numerically higher frequency of these bot-influence keywords compared to non-flagged accounts, the difference was not statistically significant in this analysis. This suggests that, based solely on keyword frequency, bots and humans in these subreddits may not differ substantially in their topical focus when analyzed with simple methods.
 
-**Figure 2: Word Cloud for /r/politics**
+![Word Cloud for /r/politics as generated by the Gemini LLM based on a large sample of comments from the subreddit.](detecting_bots_on_reddit_code_files/figure-pdf/cell-29-output-2.pdf){#fig-polwc width=85%}
 
-*(Figure 2: Word Cloud for /r/politics is inserted here -  See Appendix B, Figure 1 in the original notebook)*
-
-
-*   **Sentiment Analysis:**  Sentiment analysis using VADER revealed subtle differences in the average sentiment polarity of comments from flagged and non-flagged accounts.  While both groups exhibited a generally negative sentiment, comments from flagged accounts showed a slightly more pronounced negative sentiment on average, particularly in politically polarized subreddits. However, similar to keyword analysis, this difference in average sentiment was not statistically significant. This indicates that, based on sentiment scores alone, distinguishing between bot and human comments remains challenging with basic sentiment analysis tools, suggesting bots may be capable of mimicking human sentiment expression to some extent.
+*   **Sentiment Analysis:**  Sentiment analysis using VADER revealed subtle differences in the average sentiment polarity of comments from flagged and non-flagged accounts.  However, similar to keyword analysis, this difference in average sentiment was not statistically significant. This indicates that, based on sentiment scores alone, distinguishing between bot and human comments remains challenging with basic sentiment analysis tools, suggesting bots may be capable of mimicking human sentiment expression to some extent, especially in an age where state of the art human-like text generation has an extremely low barrier of access.
 
 The lack of statistically significant differences in keyword frequencies and sentiment scores between flagged and non-flagged accounts suggests that, when relying solely on these metrics, bots may be increasingly adept at mimicking human language patterns, at least at a surface level of topic and sentiment. This underscores the limitation of relying solely on simple content analysis or meta-metrics for bot detection and points to the need for more nuanced approaches that consider the deeper semantic and contextual aspects of comment content, potentially through human or advanced LLM-based content labeling.
 
@@ -113,36 +113,29 @@ The lack of statistically significant differences in keyword frequencies and sen
 
 Exploratory quantitative evaluation using simple machine learning classifiers provided a preliminary assessment of the heuristic-based bot detection approach.
 
-*   **Classification Model Performance:**  Random Forest, SVM, and Neural Network classifiers were trained to distinguish between flagged and non-flagged accounts using the heuristic-derived features.  The Random Forest classifier achieved the highest performance, with an accuracy of approximately 75% in cross-validation.  SVM and Neural Network models showed slightly lower accuracy rates (around 70% and 68%, respectively).
+*   **Classification Model Performance:**  Random Forest, SVM, and Neural Network classifiers were trained to distinguish between flagged and non-flagged accounts using the heuristic-derived features.
 
-*   **Feature Importance:** Feature importance analysis from the Random Forest model indicated that posting frequency and content repetitiveness were the most influential features in distinguishing between flagged and non-flagged accounts. Account age, karma score, and em-dash presence also contributed to the model's predictive capability, albeit to a lesser extent. This reinforces the idea that behavioral patterns, captured by meta-metrics like posting frequency and content repetition, are more indicative of bot activity than simple content analysis of keywords or sentiment in this heuristic approach.
+*   **Feature Importance:** Feature importance analysis from the best performing model, the Random Forest model, indicated that posting frequency and content repetitiveness were the most influential features in distinguishing between flagged and non-flagged accounts. This is shown in @fig-importance. Account age, karma score, and em-dash presence also contributed to the model's predictive capability, albeit to a lesser extent. This reinforces the idea that behavioral patterns, captured by meta-metrics like posting frequency and content repetition, are more indicative of bot activity than simple content analysis of keywords or sentiment in this heuristic approach.
 
-*   **Confusion Matrices:** Figure 3 shows the confusion matrix for the Random Forest classifier, which achieved the best performance among the tested models. The model exhibited a tendency to misclassify some non-bot accounts as bots (false positives), while achieving relatively better performance in correctly identifying flagged accounts (true positives). This suggests that the heuristic-based approach, while effective in identifying some bot-like accounts based on meta-metrics, may also inadvertently flag some legitimate, highly active users.
+![Feature Importance bar chart depicting the features that most helped the model classify each user into categories.](detecting_bots_on_reddit_code_files/figure-pdf/cell-22-output-6.pdf){#fig-importance width=85%}
 
-**Figure 3: Confusion Matrix for Random Forest Classifier**
+*   **Confusion Matrices:** @fig-confmat shows the confusion matrix for the Random Forest classifier, which achieved the best performance among the tested models, as well as the other 2 classifiers. The model exhibited a tendency to misclassify some non-bot accounts as bots (false positives), while achieving relatively better performance in correctly identifying flagged accounts (true positives). This suggests that the heuristic-based approach, while effective in identifying some bot-like accounts based on meta-metrics, may also inadvertently flag some legitimate, highly active users.
 
-*(Figure 3: Confusion Matrix for Random Forest Classifier is inserted here - See Appendix B, Figure 6 in the original notebook)*
+These quantitative results are preliminary and should be interpreted cautiously due to the lack of a true ground truth dataset and the limitations of relying solely on meta-metrics and basic content features. However, they provide initial evidence supporting the heuristic-based approach's potential for bot detection on Reddit and highlight areas for future refinement, particularly in reducing false positives and incorporating more sophisticated content-based features derived from labeled data, as well as building more balanced datasets with higher representations for what a bot may look like.
 
-
-These quantitative results are preliminary and should be interpreted cautiously due to the lack of a true ground truth dataset and the limitations of relying solely on meta-metrics and basic content features. However, they provide initial evidence supporting the heuristic-based approach's potential for bot detection on Reddit and highlight areas for future refinement, particularly in reducing false positives and incorporating more sophisticated content-based features derived from labeled data.
+![Confusion Matrix for each of the 3 classifiers employed in the exploratory supervised learning analysis: a random forest left untuned is better at identifying the structures implied by the heuristic labeling compared to the other 2 techniques we have explored.](detecting_bots_on_reddit_code_files/figure-pdf/cell-22-output-5.pdf){#fig-confmat width=100%}
 
 ## Clustering Analysis
 
-To further explore the underlying structure of the user-level data and visually assess potential groupings, dimensionality reduction and clustering techniques were applied. Principal Component Analysis (PCA) was used to reduce the dimensionality of the user-level dataset to two principal components, allowing for visualization in a 2D space.  K-Means and DBSCAN clustering algorithms were then applied to the PCA-transformed data to identify potential clusters of users based on their features.
+To further explore the underlying structure of the user-level data and visually assess potential groupings, dimensionality reduction and clustering techniques were applied. Principal Component Analysis (PCA) was used to reduce the dimensionality of the user-level dataset to two principal components, allowing for visualization in a 2D space.  K-Means and DBSCAN clustering algorithms were then applied to the PCA-transformed data to identify potential clusters of users based on their features. The hyperparameters for each of the clustering algorithm were selected according to the highest Average Silhouette Width.
 
-Figure 4 displays scatter plots visualizing the results of K-Means and DBSCAN clustering, projected onto the first two principal components (PC1 and PC2).
-
-**Figure 4: K-Means and DBSCAN Clustering Visualizations**
-
-*(Figure 4: K-Means and DBSCAN Clustering Visualizations are inserted here - See Appendix B, Figures 10 and 11 in the original notebook)*
-
-*Note: The scatter plots visualize K-Means (top) and DBSCAN (bottom) clustering results after PCA dimensionality reduction. Points are colored by cluster assignment, and marker style indicates the 'Bot Category' assigned by heuristics. Axis labels indicate the top loading features for each Principal Component.*
-
-As shown in Figure 4, the visualizations reveal some degree of clustering in the user data, although distinct, well-separated clusters are not clearly evident.
+@fig-clust displays scatter plots visualizing the results of K-Means and DBSCAN clustering, projected onto the first two principal components (PC1 and PC2). As shown in the figure, the visualizations reveal some degree of clustering in the user data, although distinct, well-separated clusters are not clearly evident.
 
 *   **K-Means Clustering:** The K-Means plot (top) shows a partitioning of the data into distinct clusters, but the clusters exhibit considerable overlap.  PC1, representing a combination of features like average comment length, content cosine similarity, and comment length, is plotted on the x-axis. PC2, representing features like em-dash presence, karma, and median seconds between comments, is plotted on the y-axis.  While K-Means forces data points into clusters, the visual overlap suggests that these clusters may not represent inherently distinct groups in terms of bot-like characteristics, and the algorithm may be imposing structure where clear separations do not naturally exist in the data based on these features alone.
 
 *   **DBSCAN Clustering:** The DBSCAN plot (bottom) identifies a central dense cluster (Cluster 0, shown in yellow) and designates a significant portion of data points as noise (Cluster -1, shown in purple), indicating that these points do not belong to any well-defined cluster based on DBSCAN's density-based criteria. Similar to K-Means, the axes represent PC1 and PC2 with the same feature loadings. The presence of a large noise cluster further supports the idea that clear, distinct groupings based on bot vs. human characteristics, as captured by these features and visualized in reduced dimensions, are not strongly present in the data.  The limited cluster structure suggests that bot and human accounts, as identified by heuristics and visualized through PCA, may exist on a spectrum of behavioral characteristics rather than in clearly separated categories, at least based on the features used for clustering and visualization.
+
+![K-Means and DBSCAN Clustering Visualizations: the scatter plots visualize K-Means (top) and DBSCAN (bottom) clustering results after PCA dimensionality reduction. Points are colored by cluster assignment, and marker style indicates the 'Bot Category' assigned by heuristics. Axis labels indicate the top loading features for each Principal Component.](detecting_bots_on_reddit_code_files/figure-pdf/cell-24-output-1.pdf){#fig-clust width=85%}
 
 These clustering visualizations, while not revealing definitive bot clusters,  visually reinforce the idea that distinguishing between bots and humans based solely on the meta-metrics and basic content features used in this study is a complex task. The lack of clear cluster separation suggests that more nuanced, potentially content-aware, features and more sophisticated analytical techniques might be necessary to effectively identify and categorize bot activity on Reddit beyond the initial heuristic flagging.
 
@@ -151,7 +144,9 @@ These clustering visualizations, while not revealing definitive bot clusters,  v
 
 This study explored the feasibility of using basic heuristic methods for detecting bot influence on Reddit discussions. The findings suggest that simple heuristics, based on readily observable account characteristics such as username patterns, account age, karma, posting frequency, content repetitiveness, and em-dash presence, can effectively identify a subset of accounts exhibiting bot-like behavior based on meta-metrics. Descriptive analysis of flagged accounts revealed patterns consistent with known bot characteristics, and exploratory quantitative evaluation using machine learning classifiers provided preliminary support for the predictive capability of the heuristic-based approach when relying on these meta-metrics and basic content features.
 
-However, and importantly, the analysis of keyword frequencies and sentiment scores did *not* reveal statistically significant differences between flagged and non-flagged accounts. This key finding suggests that, while heuristic methods based on meta-metrics can identify certain bot-like accounts, these bots may be increasingly sophisticated in mimicking human language in terms of topical focus and sentiment expression, at least when analyzed using simple keyword frequency and sentiment analysis tools.  This highlights a crucial limitation of relying solely on meta-metrics and basic content analysis for bot detection in the face of increasingly advanced automated accounts. It also suggests that simply analyzing keyword frequencies or overall sentiment polarity may not be sufficient to distinguish bots from humans in terms of content, and more nuanced, context-aware content analysis methods are needed.
+However, and importantly, the analysis of keyword frequencies and sentiment scores did *not* reveal statistically significant differences between flagged and non-flagged accounts (see @fig-comparison). This key finding suggests that, while heuristic methods based on meta-metrics can identify certain bot-like accounts, these bots may be increasingly sophisticated in mimicking human language in terms of topical focus and sentiment expression, at least when analyzed using simple keyword frequency and sentiment analysis tools.  This highlights a crucial limitation of relying solely on meta-metrics and basic content analysis for bot detection in the face of increasingly advanced automated accounts. It also suggests that simply analyzing keyword frequencies or overall sentiment polarity may not be sufficient to distinguish bots from humans in terms of content, and more nuanced, context-aware content analysis methods are needed.
+
+![Simple metrics indicating lack of significant differences between users labeled as likely humans vs. possible or likely bots. The text readability measure can be further explored in the code file or in its original source paper [@kincaid1975flesch].](detecting_bots_on_reddit_code_files/figure-pdf/cell-25-output-1.pdf){#fig-comparison width=100%}
 
 The study also investigated potential narrative amplification and polarization associated with flagged accounts. While suggestive evidence of narrative amplification was observed through keyword analysis, and subtle differences in sentiment polarity were detected, the lack of statistical significance in these content-based analyses underscores the challenges in definitively attributing these phenomena to bot activity based on the methods employed here.  LLM-generated word clouds, while thematically informative in visualizing subreddit topics, similarly did not provide clear differentiation between bot and human language use in terms of content.
 
@@ -196,7 +191,7 @@ This study provides a preliminary exploration into the detection of bots on Redd
 
 \newpage
 
-# Appendices {.unnumbered .appendix}
+# Appendix {.unnumbered .appendix}
 
 ## Keyword Generation and Subreddit Selection Details {.unnumbered .appendix}
 
@@ -344,25 +339,142 @@ top_vulnerable = subs_df.nlargest(50, 'Bot Score')[['Name', 'Subscribers', 'Subm
 top_vulnerable.head(10)
 ```
 
-## Figures and Tables {.unnumbered .appendix}
+## Prompt for LLM-based Word Clouds and Sentiment Analysis {.unnumbered}
 
-**Figure 1: Word Cloud for /r/politics**
-*(See Appendix B, Figure 1 in the original notebook)*
+```{python}
+#| eval: false
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+from google import genai
+from google.genai import types
+from wordcloud import WordCloud
+import random
 
-**Figure 2: Word Cloud for /r/worldnews**
-*(See Appendix B, Figure 2 in the original notebook)*
+# ----- Step 1: Extract Top 5 Subreddits from ml_features -----
+# Assume ml_features is already in your environment.
+top_subreddits = ml_features['subreddit'].value_counts().head(5).index.tolist()
 
-**Figure 3: Word Cloud for /r/news**
-*(See Appendix B, Figure 3 in the original notebook)*
+# ----- Step 2: Stratified Sampling ----- 
+sampled_comments = {}
+sample_size = 100
+for subreddit in top_subreddits:
+    subreddit_comments = ml_features[ml_features['subreddit'] == subreddit]['comment_body']
+    if len(subreddit_comments) > sample_size:
+        sampled = subreddit_comments.sample(n=sample_size, random_state=42)
+    else:
+        sampled = subreddit_comments
+    sampled_comments[subreddit] = sampled.tolist()
 
-**Figure 4: Word Cloud for /r/technology**
-*(See Appendix B, Figure 4 in the original notebook)*
+# ----- Step 3: Gemini API generate() Function -----
+def generate(prompt):
+    client = genai.Client(
+        api_key=os.getenv("GEMINI_API_KEY"),
+    )
+    model = "gemini-2.0-flash"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(text=prompt),
+            ],
+        ),
+    ]
+    generate_content_config = types.GenerateContentConfig(
+        temperature=0,
+        top_p=0,
+        top_k=1,
+        max_output_tokens=8192,
+        response_mime_type="text/plain",
+    )
+    complete_response = ""
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        complete_response += chunk.text
+    return complete_response.strip()
 
-**Figure 5: Word Cloud for /r/science**
-*(See Appendix B, Figure 5 in the original notebook)*
+# ----- Step 4: Query the LLM for Each Subreddit -----
+subreddit_responses = {}
+for subreddit, comments in sampled_comments.items():
+    # Take a random sample of comments if there are too many
+    if len(" ".join(comments)) > 4000:
+        random.seed(42)  # For reproducibility
+        sampled_comments = random.sample(comments, min(len(comments), 50))
+        text_blob = " ".join(sampled_comments)[:4000]
+    else:
+        text_blob = " ".join(comments)[:4000]
+    prompt = (
+        f"Perform sentiment analysis on the following comments from subreddit /r/{subreddit}. "
+        "Identify 20 unique keywords (based exclusively on the text you are fed) that capture the essence of this subreddit (which can later be used for word clouds), and provide a brief sentiment summary (e.g. note if the overall tone is positive, negative, or neutral). "
+        "At the end, on a new separate line, output exactly: 'Keywords: keyword1, keyword2, etc.' followed by a comma-separated list of the keywords, with no extra text.\n\nComments:\n" 
+        + text_blob
+    )
+    response = generate(prompt)
+    subreddit_responses[subreddit] = response
+    print(f"/r/{subreddit} Response:\n{response}\n{'-'*60}\n")
 
-**Figure 6: Confusion Matrix for SVM Classifier**
-*(See Appendix B, Figure 7 in the original notebook)*
+# ----- Step 5: Extract Keywords and Build Word Clouds -----
+for subreddit, response in subreddit_responses.items():
+    keywords_line = None
+    for line in response.splitlines():
+        if line.strip().startswith("Keywords:"):
+            keywords_line = line.strip()
+            break
+    if keywords_line:
+        # Remove the "Keywords:" prefix and extra spaces, then split by commas.
+        keywords_part = keywords_line[len("Keywords:"):].strip()
+        keywords = [kw.strip() for kw in keywords_part.split(",") if kw.strip()]
+    else:
+        keywords = []
+    
+    if keywords:
+        # Create a text blob from keywords for word cloud generation.
+        wordcloud_text = " ".join(keywords)
+        wc = WordCloud(width=800, height=400, background_color='white', min_word_length=3).generate(wordcloud_text)
+        plt.figure(figsize=(8, 4))
+        plt.imshow(wc, interpolation="bilinear")
+        plt.axis("off")
+        plt.title(f"/r/{subreddit} Word Cloud")
+        plt.show()
+    else:
+        print(f"No valid keywords extracted for /r/{subreddit}.")
+```
 
-**Figure 7: Confusion Matrix for Neural Network Classifier**
-*(See Appendix B, Figure 8 in the original notebook)*
+## Additional Figures {.unnumbered .appendix}
+
+::: {#fig-wordclouds-gemini layout-ncol=2}
+
+![r/worldnews](detecting_bots_on_reddit_code_files/figure-pdf/cell-29-output-3.pdf)
+
+![r/news](detecting_bots_on_reddit_code_files/figure-pdf/cell-29-output-4.pdf)
+
+![r/technology](detecting_bots_on_reddit_code_files/figure-pdf/cell-29-output-5.pdf)
+
+![r/science](detecting_bots_on_reddit_code_files/figure-pdf/cell-29-output-6.pdf)
+
+Word Clouds generated by Gemini for the 4 subreddits that were not shown in the main document body.
+:::
+
+::: {#fig-wordclouds-freq layout-ncol=3}
+
+![r/politics](detecting_bots_on_reddit_code_files/figure-pdf/cell-27-output-3.pdf)
+
+![r/worldnews](detecting_bots_on_reddit_code_files/figure-pdf/cell-27-output-6.pdf)
+
+![r/news](detecting_bots_on_reddit_code_files/figure-pdf/cell-27-output-2.pdf)
+
+![r/technology](detecting_bots_on_reddit_code_files/figure-pdf/cell-27-output-5.pdf)
+
+![r/science](detecting_bots_on_reddit_code_files/figure-pdf/cell-27-output-4.pdf)
+
+Word Clouds generated by simply looking at word frequency for all 5 subreddits. You can notice that some words which do not appear specific to any one subreddit are more commonly shown here, informing the need for either a more sophisticated method of creating the word cloud, or simply the adoption of LLMs for Word Cloud generation.
+:::
+
+![Average Compound Sentiment Scores by subreddit. Higher score indicates a more positive sentiment.](detecting_bots_on_reddit_code_files/figure-pdf/cell-27-output-1.pdf)
+
+![Word Clouds (generated by simple text frequency analysis) showing that users and bots do not have significantly different term usage patterns.](detecting_bots_on_reddit_code_files/figure-pdf/cell-25-output-2.pdf)
+
+![Performance of each of the 3 models in predicting heuristically labeled user class on a simple train/test split.](detecting_bots_on_reddit_code_files/figure-pdf/cell-22-output-4.pdf)

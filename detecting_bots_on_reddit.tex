@@ -255,6 +255,8 @@
 }
 
 \setstretch{1}
+\newpage
+
 \section{Introduction}\label{introduction}
 
 The pervasive presence of automated accounts, or bots, on social media
@@ -323,39 +325,45 @@ accounts\textsuperscript{{[}\citeproc{ref-redditbotwatch}{3}{]}}.
 
 One prominent area of research involves the use of machine learning for
 bot detection. Studies have explored various algorithms, including
-tree-based classifiers like Random Forests and Decision Trees, as well
-as more complex deep learning models such as Long Short-Term Memory
-(LSTM)
-networks\textsuperscript{{[}\citeproc{ref-multibotdetector}{4},\citeproc{ref-evalsocialbotmodels}{5}{]}}.
+tree-based classifiers like Random
+Forests\textsuperscript{{[}\citeproc{ref-breiman2001random}{5}{]}} and
+Decision
+Trees\textsuperscript{{[}\citeproc{ref-breiman1984classification}{6}{]}},
+as well as more complex deep learning models such as Long Short-Term
+Memory (LSTM)
+networks\textsuperscript{{[}\citeproc{ref-multibotdetector}{4},\citeproc{ref-evalsocialbotmodels}{7},\citeproc{ref-hochreiter1997long}{8}{]}}.
 These approaches typically rely on a combination of features,
 encompassing user metadata, activity patterns, and content
 characteristics, to classify accounts as either bots or humans. For
-instance, ensemble methods, which combine multiple classifiers, have
-demonstrated promising results in multi-platform bot detection,
-achieving notable accuracy
+instance, ensemble
+methods\textsuperscript{{[}\citeproc{ref-dietterich2000ensemble}{9}{]}},
+which combine multiple classifiers, have demonstrated promising results
+in multi-platform bot detection, achieving notable accuracy
 rates\textsuperscript{{[}\citeproc{ref-multibotdetector}{4},\citeproc{ref-multibotdetector}{4}{]}}.
 
 Another significant research direction focuses on anomaly detection
 techniques, which aim to identify accounts exhibiting behaviors that
 deviate significantly from typical human user
-patterns\textsuperscript{{[}\citeproc{ref-anomalycloudflare}{6},\citeproc{ref-anomalyf5networks}{7}{]}}.
+patterns\textsuperscript{{[}\citeproc{ref-anomalycloudflare}{10}--\citeproc{ref-chandola2009anomaly}{12}{]}}.
 These unsupervised learning methods are particularly valuable for
 detecting novel bot behaviors that may not be captured by supervised
 learning models trained on pre-labeled data. Histogram-Based Outlier
-Scoring (HBOS) is one such algorithm that has been applied to scalable
-anomaly detection in large datasets, demonstrating its potential for
-identifying unusual activity patterns indicative of bot
-behavior\textsuperscript{{[}\citeproc{ref-anomalycloudflare}{6}{]}}.
+Scoring
+(HBOS)\textsuperscript{{[}\citeproc{ref-goldstein2012histogram}{13}{]}}
+is one such algorithm that has been applied to scalable anomaly
+detection in large datasets, demonstrating its potential for identifying
+unusual activity patterns indicative of bot
+behavior\textsuperscript{{[}\citeproc{ref-anomalycloudflare}{10}{]}}.
 
 While a substantial body of research exists on bot detection in social
 media, fewer studies have specifically focused on
-Reddit\textsuperscript{{[}\citeproc{ref-botdetectionreddit}{1},\citeproc{ref-redditbotnetwork}{8},\citeproc{ref-mlredditbots}{9}{]}}.
+Reddit\textsuperscript{{[}\citeproc{ref-botdetectionreddit}{1},\citeproc{ref-redditbotnetwork}{14},\citeproc{ref-mlredditbots}{15}{]}}.
 Reddit's unique structure, characterized by topic-specific subreddits
 and community-driven moderation, presents both distinct challenges and
 opportunities for bot detection. Research focusing on Reddit has begun
 to explore platform-specific features, such as user interaction networks
 within subreddits, to identify bot
-activity\textsuperscript{{[}\citeproc{ref-redditbotnetwork}{8}{]}}.
+activity\textsuperscript{{[}\citeproc{ref-redditbotnetwork}{14}{]}}.
 Furthermore, studies have investigated the role of bots in specific
 contexts on Reddit, such as political discussions and the dissemination
 of
@@ -365,12 +373,12 @@ Publicly available datasets play a crucial role in advancing research in
 this field. While datasets specifically labeled for Reddit bot detection
 are less abundant compared to those for Twitter, resources like the
 Pushshift Reddit
-Dataset\textsuperscript{{[}\citeproc{ref-pushshiftredditdataset}{10}{]}}
+Dataset\textsuperscript{{[}\citeproc{ref-pushshiftredditdataset}{16}{]}}
 and the Reddit Comments
-Dataset\textsuperscript{{[}\citeproc{ref-redditcommentsdataset}{11}{]}}
+Dataset\textsuperscript{{[}\citeproc{ref-redditcommentsdataset}{17}{]}}
 offer valuable opportunities for researchers to collect and analyze
 Reddit-specific
-data\textsuperscript{{[}\citeproc{ref-multibotdetector}{4},\citeproc{ref-pushshiftredditdataset}{10},\citeproc{ref-redditcommentsdataset}{11}{]}}.
+data\textsuperscript{{[}\citeproc{ref-multibotdetector}{4},\citeproc{ref-pushshiftredditdataset}{16},\citeproc{ref-redditcommentsdataset}{17}{]}}.
 These datasets, while not always labeled for bot activity, provide rich
 information on user comments, posts, and metadata that can be used to
 develop and evaluate bot detection methods.
@@ -404,20 +412,23 @@ challenges posed by bot activity on Reddit.
 \subsection{Data}\label{data}
 
 The data for this study was collected using the Reddit API via the
-Python Reddit API Wrapper (PRAW). The final data collection period
-spanned March 21 and 22, 2025. The unit of analysis is individual Reddit
-comments, as well as the users posting them.
+Python Reddit API Wrapper
+(PRAW)\textsuperscript{{[}\citeproc{ref-praw2024}{18}{]}}. The final
+data collection period spanned March 21 and 22, 2025. The unit of
+analysis is individual Reddit comments, as well as the users posting
+them.
 
 \textbf{Subreddit Selection:} Subreddits were selected based on their
 high subscriber counts and relevance to topics frequently targeted by
 bots, such as politics and news. To ensure a reproducible and systematic
-subreddit selection, keywords were generated using Google Gemini, a
+subreddit selection, keywords were generated using Google
+Gemini\textsuperscript{{[}\citeproc{ref-googleai2023gemini}{19}{]}}, a
 large language model API. The prompt provided to Gemini requested
 keywords associated with controversial topics likely to attract bot
-activity. (See Appendix A.1 for the prompt and code used for keyword
+activity. (See the Appendix for the prompt and code used for keyword
 generation). Based on these keywords and subscriber counts, a scoring
 system was developed to rank subreddits by their potential vulnerability
-to bot influence. (See Appendix A.2 for the scoring system and selected
+to bot influence. (See the Appendix for the scoring system and selected
 subreddits). The top 10 subreddits according to this scoring system were
 initially considered. For in-depth analysis and LLM querying, 5
 subreddits with high bot influence scores were chosen: r/worldnews,
@@ -474,6 +485,10 @@ they exhibited a combination of the following characteristics:
   posting frequency, commenting multiple times within unusually short
   time intervals, were considered suspicious.
 \item
+  \textbf{Speed of Commenting:} Accounts commenting on posts (or
+  replying to parent comments made by different users) in an
+  unlikely-to-be-human quick fashion are flagged as likely to be bots.
+\item
   \textbf{Repetitive Content:} Accounts frequently posting or commenting
   with highly similar or identical text were flagged for repetitive
   content. Cosine similarity of comment text was used to quantify
@@ -484,14 +499,14 @@ they exhibited a combination of the following characteristics:
   some AI models tend to overuse this punctuation mark, which is not
   usually present in human writing due to its difficulty in being typed
   on a normal
-  keyboard\textsuperscript{{[}\citeproc{ref-redditbotdetector}{12}--\citeproc{ref-nightwateremdash}{14}{]}}.
+  keyboard\textsuperscript{{[}\citeproc{ref-redditbotdetector}{20}--\citeproc{ref-nightwateremdash}{22}{]}}.
 \end{itemize}
 
 These heuristics were chosen based on common bot characteristics
 identified in previous research and community discussions on
-Reddit\textsuperscript{{[}\citeproc{ref-redditbotslearnusetalents}{15}--\citeproc{ref-botproblem7daystodie}{17}{]}},
+Reddit\textsuperscript{{[}\citeproc{ref-redditbotslearnusetalents}{23}--\citeproc{ref-botproblem7daystodie}{25}{]}},
 and incorporating recent observations about AI-generated text
-markers\textsuperscript{{[}\citeproc{ref-redditbotdetector}{12}--\citeproc{ref-nightwateremdash}{14}{]}}.
+markers\textsuperscript{{[}\citeproc{ref-redditbotdetector}{20}--\citeproc{ref-nightwateremdash}{22}{]}}.
 A ``Bot Score'' was calculated for each account based on the number of
 heuristics triggered. Accounts exceeding a certain threshold on the
 ``Bot Score'' were classified as ``possible bots'' or ``very likely
@@ -500,13 +515,15 @@ important to note that these heuristics primarily rely on meta-metrics
 and basic content features like punctuation, and do not deeply analyze
 the semantic content of the comments themselves.
 
-\textbf{Polarization:} Polarization was assessed using sentiment
-analysis of comment content. The VADER (Valence Aware Dictionary and
-sEntiment Reasoner) sentiment analysis tool was employed to calculate
-compound sentiment scores for comments. Average sentiment scores were
-compared between comments from accounts flagged as potential bots and
-those from non-flagged accounts to identify potential differences in
-sentiment polarity, which could indicate bot-driven polarization.
+\textbf{Polarization:} A basic measure of polarization was added using
+sentiment analysis of comment content. The VADER (Valence Aware
+Dictionary and sEntiment
+Reasoner)\textsuperscript{{[}\citeproc{ref-hutto2014vader}{26}{]}}
+sentiment analysis tool was employed to calculate compound sentiment
+scores for comments. Average sentiment scores were compared between
+comments from accounts flagged as potential bots and those from
+non-flagged accounts to identify potential differences in sentiment
+polarity, which could indicate bot-driven polarization.
 
 \subsection{Models}\label{models}
 
@@ -563,18 +580,23 @@ qualitatively and quantitatively.
 \item
   \textbf{Quantitative Evaluation (Exploratory):} To explore the
   potential for quantitative evaluation, simple classification models
-  (Random Forest, SVM, Neural Network, all left untuned) were trained
-  using features derived from the heuristic analysis (Bot Score, account
-  age, karma, posting frequency, content repetitiveness, em-dash
-  presence, etc.). The performance of these models was assessed using
-  standard classification metrics. This quantitative evaluation was
-  exploratory, given the lack of a true ``ground truth'' dataset for bot
-  identification in this study and the limitation of relying solely on
-  meta-metrics and basic content features without labeled content data.
-  It aimed to provide a preliminary indication of the heuristic-based
-  approach's predictive capability and guide future research directions
-  involving more rigorous machine learning evaluation that incorporates
-  content-based features from labeled data.
+  (Random
+  Forest\textsuperscript{{[}\citeproc{ref-breiman2001random}{5}{]}},
+  SVMs\textsuperscript{{[}\citeproc{ref-cortes1995support}{27}{]}},
+  Neural
+  Network\textsuperscript{{[}\citeproc{ref-lecun2015deep}{28}{]}}, all
+  left untuned) were trained using features derived from the heuristic
+  analysis (Bot Score, account age, karma, posting frequency, content
+  repetitiveness, em-dash presence, etc.). The performance of these
+  models was assessed using standard classification metrics. This
+  quantitative evaluation was exploratory, given the lack of a true
+  ``ground truth'' dataset for bot identification in this study and the
+  limitation of relying solely on meta-metrics and basic content
+  features without labeled content data. It aimed to provide a
+  preliminary indication of the heuristic-based approach's predictive
+  capability and guide future research directions involving more
+  rigorous machine learning evaluation that incorporates content-based
+  features from labeled data.
 \end{itemize}
 
 \subsection{Reproducibility}\label{reproducibility}
@@ -611,86 +633,62 @@ parameter to 0.
 
 \section{Empirical Results}\label{empirical-results}
 
-\subsection{Descriptive Analysis of Bot
-Characteristics}\label{descriptive-analysis-of-bot-characteristics}
+\subsection{Descriptive Summary of Heuristic
+Criteria}\label{descriptive-summary-of-heuristic-criteria}
 
-The heuristic-based bot detection method identified a subset of Reddit
-accounts exhibiting characteristics consistent with bot-like behavior.
-Descriptive analysis of these flagged accounts revealed several key
-patterns:
-
-\begin{itemize}
-\item
-  \textbf{Username Patterns:} A significant proportion of flagged
-  accounts displayed usernames composed of random strings of letters and
-  numbers or followed patterns associated with bot accounts, such as
-  default Reddit-generated usernames.
-\item
-  \textbf{Account Age:} Flagged accounts tended to be younger on average
-  compared to non-flagged accounts, with a notable concentration of
-  accounts less than a year old.
-\item
-  \textbf{Karma Distribution:} The karma scores of flagged accounts
-  showed a bimodal distribution, with some accounts exhibiting very low
-  karma and others surprisingly high karma. The high-karma bot accounts
-  appeared to be ``karma-farming'' bots, designed to accumulate karma to
-  appear more legitimate.
-\item
-  \textbf{Posting Frequency:} Flagged accounts exhibited significantly
-  higher posting frequencies compared to non-flagged accounts. Some
-  accounts posted comments in multiple subreddits within extremely short
-  time intervals, indicative of automated posting behavior.
-\item
-  \textbf{Content Repetitiveness:} Analysis of comment content revealed
-  a higher degree of text similarity and repetition among flagged
-  accounts. Many flagged accounts posted generic, short comments that
-  were often contextually irrelevant or repeated across different
-  threads.
-\item
-  \textbf{Em-dash Usage:} Flagged accounts showed a slightly higher
-  prevalence of em-dash usage in their comments compared to non-flagged
-  accounts, although this difference was not statistically significant
-  in this analysis.
-\end{itemize}
+The heuristic-based method, designed to flag accounts based on
+pre-defined meta-metric criteria, identified a specific subset of Reddit
+accounts. It is essential to understand that this section describes the
+output of the heuristic flagging process itself, and does not present
+independently validated findings about actual bot characteristics. The
+following keyword and sentiment analyses, presented next, similarly do
+not provide such independent validation. Therefore, this section is best
+understood as a brief, factual report on the direct output of the
+heuristic flagging process, rather than a conclusive analysis of bot
+characteristics. The limitations of this approach are further discussed
+in the conclusion.
 
 \subsection{Cross-Subreddit Content Similarity and Narrative
 Amplification}\label{cross-subreddit-content-similarity-and-narrative-amplification}
 
 To understand the relationships between the top subreddits in terms of
 content, and to explore potential narrative amplification, a
-cross-subreddit content similarity analysis was conducted. Figure 1
-displays a heatmap visualizing the cosine similarity of TF-IDF vectors
+cross-subreddit content similarity analysis was conducted.
+Figure~\ref{fig-cross} displays a heatmap visualizing the cosine
+similarity of TF-IDF
+vectors\textsuperscript{{[}\citeproc{ref-salton1988term}{29}{]}}
 generated from the combined text of comments within each of the top 5
 subreddits.
 
-\begin{figure}[H]
-
-{\centering \includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-28-output-1.pdf}
-
-}
-
-\caption{Cross-Subreddit Content Similarity Heatmap: the heatmap
-visualizes the cosine similarity of TF-IDF vectors between the top 5
-subreddits, with darker colors indicating higher similarity and lighter
-colors indicating lower similarity.}
-
-\end{figure}%
-
-As shown in Figure 1, the heatmap reveals moderate content similarity
-between certain subreddits. \texttt{r/news} and \texttt{r/worldnews}
-exhibit the highest content similarity (0.81), which is expected given
-their overlapping topical focus on current events. \texttt{r/politics}
-also shows relatively high similarity with \texttt{r/news} (0.80) and
-\texttt{r/worldnews} (0.72), indicating thematic connections between
-political discussions and news reporting. \texttt{r/technology} and
-\texttt{r/science} show lower similarity with the news and politics
-subreddits, reflecting their distinct subject matter. \texttt{r/science}
-and \texttt{r/technology} exhibit moderate similarity to each other
+As shown in Figure~\ref{fig-cross}, the heatmap reveals moderate content
+similarity between certain subreddits. r/news and r/worldnews exhibit
+one of the highest content similarities (0.81), which is expected given
+their overlapping topical focus on current events. r/politics also shows
+relatively high similarity with r/news (0.80) and r/worldnews (0.72),
+indicating thematic connections between political discussions and news
+reporting. r/technology and r/science show lower similarity with the
+news and politics subreddits, reflecting their distinct subject matter.
+r/science and r/technology exhibit moderate similarity to each other
 (0.63). This suggests a thematic clustering where news and politics
 subreddits are more closely related in content, while technology and
 science form a separate, though somewhat related, cluster. Bots
 operating across these subreddits might exploit these thematic
 connections to amplify narratives across related communities.
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-28-output-1.pdf}
+
+}
+
+\caption{\label{fig-cross}Cross-Subreddit Content Similarity Heatmap:
+the heatmap visualizes the cosine similarity of TF-IDF vectors between
+the top 5 subreddits, with darker colors indicating higher similarity
+and lighter colors indicating lower similarity.}
+
+\end{figure}%
 
 Analysis of keyword frequencies and sentiment scores provided further
 insights into potential narrative amplification and polarization
@@ -699,13 +697,13 @@ associated with flagged accounts.
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Keyword Analysis:} Figure 2 shows the word cloud generated by
-  Google Gemini for the r/politics subreddit. Keywords like
-  ``government,'' ``election,'' ``Democrats,'' and ``Trump'' are
-  prominently featured, reflecting the politically charged nature of
-  discussions in this subreddit. Keywords generated by Google Gemini for
-  subreddits like r/politics and r/worldnews, which are known to be
-  prone to bot activity, were frequently observed in comments from
+  \textbf{Keyword Analysis:} Figure~\ref{fig-polwc} shows the word cloud
+  generated by Google Gemini for the r/politics subreddit as an example.
+  Keywords like ``government,'' ``election,'' ``Democrats,'' and
+  ``Trump'' are prominently featured, reflecting the politically charged
+  nature of discussions in this subreddit. Keywords generated by Google
+  Gemini for subreddits like r/politics and r/worldnews, which are known
+  to be prone to bot activity, were frequently observed in comments from
   flagged accounts. These keywords often related to politically charged
   topics, conspiracy theories, and divisive narratives. While flagged
   accounts exhibited a numerically higher frequency of these
@@ -716,10 +714,18 @@ associated with flagged accounts.
   when analyzed with simple methods.
 \end{itemize}
 
-\textbf{Figure 2: Word Cloud for /r/politics}
+\begin{figure}
 
-\emph{(Figure 2: Word Cloud for /r/politics is inserted here - See
-Appendix B, Figure 1 in the original notebook)}
+\centering{
+
+\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-29-output-2.pdf}
+
+}
+
+\caption{\label{fig-polwc}Word Cloud for /r/politics as generated by the
+Gemini LLM based on a large sample of comments from the subreddit.}
+
+\end{figure}%
 
 \begin{itemize}
 \tightlist
@@ -758,38 +764,48 @@ detection approach.
 \item
   \textbf{Classification Model Performance:} Random Forest, SVM, and
   Neural Network classifiers were trained to distinguish between flagged
-  and non-flagged accounts using the heuristic-derived features. The
-  Random Forest classifier achieved the highest performance, with an
-  accuracy of approximately 75\% in cross-validation. SVM and Neural
-  Network models showed slightly lower accuracy rates (around 70\% and
-  68\%, respectively).
+  and non-flagged accounts using the heuristic-derived features.
 \item
-  \textbf{Feature Importance:} Feature importance analysis from the
-  Random Forest model indicated that posting frequency and content
-  repetitiveness were the most influential features in distinguishing
-  between flagged and non-flagged accounts. Account age, karma score,
-  and em-dash presence also contributed to the model's predictive
+  \textbf{Feature Importance:} Feature importance analysis from the best
+  performing model, the Random Forest model, indicated that posting
+  frequency and content repetitiveness were the most influential
+  features in distinguishing between flagged and non-flagged accounts.
+  This is shown in Figure~\ref{fig-importance}. Account age, karma
+  score, and em-dash presence also contributed to the model's predictive
   capability, albeit to a lesser extent. This reinforces the idea that
   behavioral patterns, captured by meta-metrics like posting frequency
   and content repetition, are more indicative of bot activity than
   simple content analysis of keywords or sentiment in this heuristic
   approach.
-\item
-  \textbf{Confusion Matrices:} Figure 3 shows the confusion matrix for
-  the Random Forest classifier, which achieved the best performance
-  among the tested models. The model exhibited a tendency to misclassify
-  some non-bot accounts as bots (false positives), while achieving
-  relatively better performance in correctly identifying flagged
-  accounts (true positives). This suggests that the heuristic-based
-  approach, while effective in identifying some bot-like accounts based
-  on meta-metrics, may also inadvertently flag some legitimate, highly
-  active users.
 \end{itemize}
 
-\textbf{Figure 3: Confusion Matrix for Random Forest Classifier}
+\begin{figure}
 
-\emph{(Figure 3: Confusion Matrix for Random Forest Classifier is
-inserted here - See Appendix B, Figure 6 in the original notebook)}
+\centering{
+
+\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-22-output-6.pdf}
+
+}
+
+\caption{\label{fig-importance}Feature Importance bar chart depicting
+the features that most helped the model classify each user into
+categories.}
+
+\end{figure}%
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Confusion Matrices:} Figure~\ref{fig-confmat} shows the
+  confusion matrix for the Random Forest classifier, which achieved the
+  best performance among the tested models, as well as the other 2
+  classifiers. The model exhibited a tendency to misclassify some
+  non-bot accounts as bots (false positives), while achieving relatively
+  better performance in correctly identifying flagged accounts (true
+  positives). This suggests that the heuristic-based approach, while
+  effective in identifying some bot-like accounts based on meta-metrics,
+  may also inadvertently flag some legitimate, highly active users.
+\end{itemize}
 
 These quantitative results are preliminary and should be interpreted
 cautiously due to the lack of a true ground truth dataset and the
@@ -798,7 +814,24 @@ features. However, they provide initial evidence supporting the
 heuristic-based approach's potential for bot detection on Reddit and
 highlight areas for future refinement, particularly in reducing false
 positives and incorporating more sophisticated content-based features
-derived from labeled data.
+derived from labeled data, as well as building more balanced datasets
+with higher representations for what a bot may look like.
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-22-output-5.pdf}
+
+}
+
+\caption{\label{fig-confmat}Confusion Matrix for each of the 3
+classifiers employed in the exploratory supervised learning analysis: a
+random forest left untuned is better at identifying the structures
+implied by the heuristic labeling compared to the other 2 techniques we
+have explored.}
+
+\end{figure}%
 
 \subsection{Clustering Analysis}\label{clustering-analysis}
 
@@ -809,27 +842,14 @@ was used to reduce the dimensionality of the user-level dataset to two
 principal components, allowing for visualization in a 2D space. K-Means
 and DBSCAN clustering algorithms were then applied to the
 PCA-transformed data to identify potential clusters of users based on
-their features.
+their features. The hyperparameters for each of the clustering algorithm
+were selected according to the highest Average Silhouette Width.
 
-Figure 4 displays scatter plots visualizing the results of K-Means and
-DBSCAN clustering, projected onto the first two principal components
-(PC1 and PC2).
-
-\textbf{Figure 4: K-Means and DBSCAN Clustering Visualizations}
-
-\emph{(Figure 4: K-Means and DBSCAN Clustering Visualizations are
-inserted here - See Appendix B, Figures 10 and 11 in the original
-notebook)}
-
-\emph{Note: The scatter plots visualize K-Means (top) and DBSCAN
-(bottom) clustering results after PCA dimensionality reduction. Points
-are colored by cluster assignment, and marker style indicates the `Bot
-Category' assigned by heuristics. Axis labels indicate the top loading
-features for each Principal Component.}
-
-As shown in Figure 4, the visualizations reveal some degree of
-clustering in the user data, although distinct, well-separated clusters
-are not clearly evident.
+Figure~\ref{fig-clust} displays scatter plots visualizing the results of
+K-Means and DBSCAN clustering, projected onto the first two principal
+components (PC1 and PC2). As shown in the figure, the visualizations
+reveal some degree of clustering in the user data, although distinct,
+well-separated clusters are not clearly evident.
 
 \begin{itemize}
 \item
@@ -861,6 +881,23 @@ are not clearly evident.
   categories, at least based on the features used for clustering and
   visualization.
 \end{itemize}
+
+\begin{figure}
+
+\centering{
+
+\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-24-output-1.pdf}
+
+}
+
+\caption{\label{fig-clust}K-Means and DBSCAN Clustering Visualizations:
+the scatter plots visualize K-Means (top) and DBSCAN (bottom) clustering
+results after PCA dimensionality reduction. Points are colored by
+cluster assignment, and marker style indicates the `Bot Category'
+assigned by heuristics. Axis labels indicate the top loading features
+for each Principal Component.}
+
+\end{figure}%
 
 These clustering visualizations, while not revealing definitive bot
 clusters, visually reinforce the idea that distinguishing between bots
@@ -1097,77 +1134,140 @@ political discussion. \emph{ResearchGate}.
 ensemble social bot detector with applications to US 2020 elections.
 \emph{arXiv}. \url{https://arxiv.org/html/2401.14607v1}
 
+\bibitem[\citeproctext]{ref-breiman2001random}
+5. Breiman L. (2001). Random forests. \emph{Machine Learning},
+\emph{45}(1), 5--32. \url{https://doi.org/10.1023/A:1010933404324}
+
+\bibitem[\citeproctext]{ref-breiman1984classification}
+6. Breiman L., Friedman J. H., Olshen R. A., \& Stone C. J. (1984).
+\emph{Classification and regression trees}. Wadsworth International
+Group.
+
 \bibitem[\citeproctext]{ref-evalsocialbotmodels}
-5. Kutlu M., \& Selçuk A. A. (2025). Evaluation of social bot detection
+7. Kutlu M., \& Selçuk A. A. (2025). Evaluation of social bot detection
 models. \emph{ResearchGate}.
 \url{https://www.researchgate.net/publication/361038547_Evaluation_of_social_bot_detection_models}
 
+\bibitem[\citeproctext]{ref-hochreiter1997long}
+8. Hochreiter S., \& Schmidhuber J. (1997). Long short-term memory.
+\emph{Neural Computation}, \emph{9}(8), 1735--1780.
+\url{https://doi.org/10.1162/neco.1997.9.8.1735}
+
+\bibitem[\citeproctext]{ref-dietterich2000ensemble}
+9. Dietterich T. G. (2000). \emph{Ensemble methods in machine learning}.
+1--15.
+
 \bibitem[\citeproctext]{ref-anomalycloudflare}
-6. Tang J. (2024). \emph{Lessons learned from scaling up cloudflare's
+10. Tang J. (2024). \emph{Lessons learned from scaling up cloudflare's
 anomaly detection platform}.
 \url{https://blog.cloudflare.com/lessons-learned-from-scaling-up-cloudflare-anomaly-detection-platform/}
 
 \bibitem[\citeproctext]{ref-anomalyf5networks}
-7. Tang J. (2024). How does anomaly detection work? : R/f5networks. In
+11. Tang J. (2024). How does anomaly detection work? : R/f5networks. In
 \emph{Reddit}.
 \url{https://www.reddit.com/r/f5networks/comments/13jw4qg/how_does_anomaly_detection_work/}
 
+\bibitem[\citeproctext]{ref-chandola2009anomaly}
+12. Chandola V., Banerjee A., \& Kumar V. (2009). Anomaly detection: A
+survey. \emph{ACM Computing Surveys (CSUR)}, \emph{41}(3), 1--58.
+\url{https://doi.org/10.1145/1541880.1541882}
+
+\bibitem[\citeproctext]{ref-goldstein2012histogram}
+13. Goldstein M., \& Dengel A. (2012). Histogram-based outlier score
+(HBOS): A fast unsupervised anomaly detection algorithm. \emph{KI-2012:
+Poster and Demo Track}, 59--63.
+
 \bibitem[\citeproctext]{ref-redditbotnetwork}
-8. Damasceno R. (2019). Identify-bots-reddit-comment-network:
+14. Damasceno R. (2019). Identify-bots-reddit-comment-network:
 Characterization and classification of bots using only structural
 characteristics of the network. In \emph{GitHub}.
 \url{https://github.com/DamascenoRafael/identify-bots-reddit-comment-network}
 
 \bibitem[\citeproctext]{ref-mlredditbots}
-9. Skowronski J. (2019). Identifying trolls and bots on reddit with
+15. Skowronski J. (2019). Identifying trolls and bots on reddit with
 machine learning. In \emph{Medium}.
 \url{https://medium.com/towards-data-science/identifying-trolls-and-bots-on-reddit-with-machine-learning-709da5970af1}
 
 \bibitem[\citeproctext]{ref-pushshiftredditdataset}
-10. Baumgartner J., Zannettou S., Keegan B., Squire M., \& Blackburn J.
+16. Baumgartner J., Zannettou S., Keegan B., Squire M., \& Blackburn J.
 (2020). The pushshift reddit dataset. \emph{AAAI Publications}.
 \url{https://ojs.aaai.org/index.php/ICWSM/article/view/7347/7201}
 
 \bibitem[\citeproctext]{ref-redditcommentsdataset}
-11. Tkachenko V. (2021). Reddit comments dataset. In \emph{ClickHouse
+17. Tkachenko V. (2021). Reddit comments dataset. In \emph{ClickHouse
 Docs}.
 \url{https://clickhouse.com/docs/getting-started/example-datasets/reddit-comments}
 
+\bibitem[\citeproctext]{ref-praw2024}
+18. Reddit. (2024). \emph{{PRAW}: Python reddit API wrapper}.
+\url{https://praw.readthedocs.io/en/stable/}
+
+\bibitem[\citeproctext]{ref-googleai2023gemini}
+19. Google. (2023). \emph{Gemini API}.
+\url{https://ai.google.dev/products/gemini}
+
 \bibitem[\citeproctext]{ref-redditbotdetector}
-12. Tourond M. (2019). Reddit-bot-detector: A python bot that detects
+20. Tourond M. (2019). Reddit-bot-detector: A python bot that detects
 reddit bots. In \emph{GitHub}.
 \url{https://github.com/MatthewTourond/Reddit-Bot-Detector}
 
 \bibitem[\citeproctext]{ref-originalityaiblog}
-13. Gillham J., \& Lambert M. (2023). \emph{Are you getting advice from
+21. Gillham J., \& Lambert M. (2023). \emph{Are you getting advice from
 a human or bot? Reddit shows spikes in AI content}.
 \url{https://originality.ai/blog/reddit-shows-spikes-in-ai-content}
 
 \bibitem[\citeproctext]{ref-nightwateremdash}
-14. Bush C. (2023). \emph{The em dash and AI: A conjunction - night
+22. Bush C. (2023). \emph{The em dash and AI: A conjunction - night
 water}. \url{https://www.nightwater.email/em-dash-ai/}
 
 \bibitem[\citeproctext]{ref-redditbotslearnusetalents}
-15. How to identify bots on reddit : R/LearnUselessTalents. (2023). In
+23. How to identify bots on reddit : R/LearnUselessTalents. (2023). In
 \emph{Reddit}.
 \url{https://www.reddit.com/r/LearnUselessTalents/comments/15tzjkb/how_to_identify_bots_on_reddit/}
 
 \bibitem[\citeproctext]{ref-botsidentifytyrannosnorlax}
-16. u/tyrannosnorlax. (2022). Bots. How to identify them, and why do
+24. u/tyrannosnorlax. (2022). Bots. How to identify them, and why do
 they exist on reddit? In \emph{Reddit}.
 \url{https://www.reddit.com/user/tyrannosnorlax/comments/t0h466/bots_how_to_identify_them_and_why_do_they_exist/}
 
 \bibitem[\citeproctext]{ref-botproblem7daystodie}
-17. Bot problem - how to identify bot accounts (99\% accuracy) :
+25. Bot problem - how to identify bot accounts (99\% accuracy) :
 R/7daystodie. (2025). In \emph{Reddit}.
 \url{https://www.reddit.com/r/7daystodie/comments/1au1g1s/bot_problem_how_to_identify_bot_accounts_99/}
+
+\bibitem[\citeproctext]{ref-hutto2014vader}
+26. Hutto C. J., \& Gilbert E. (2014). \emph{VADER: A parsimonious
+rule-based model for sentiment analysis of social media text}.
+\url{http://comp.social.gatech.edu/papers/icwsm14.vader.hutto.pdf}
+
+\bibitem[\citeproctext]{ref-cortes1995support}
+27. Cortes C., \& Vapnik V. (1995). Support-vector networks.
+\emph{Machine Learning}, \emph{20}(3), 273--297.
+\url{https://doi.org/10.1007/BF00994018}
+
+\bibitem[\citeproctext]{ref-lecun2015deep}
+28. LeCun Y., Bengio Y., \& Hinton G. (2015). Deep learning.
+\emph{Nature}, \emph{521}(7553), 436--444.
+\url{https://doi.org/10.1038/nature14539}
+
+\bibitem[\citeproctext]{ref-salton1988term}
+29. Salton G., \& Buckley C. (1988). Term-weighting approaches in
+automatic text retrieval. \emph{Information Processing \& Management},
+\emph{24}(5), 513--523.
+\url{https://doi.org/10.1016/0306-4573(88)90021-0}
+
+\bibitem[\citeproctext]{ref-kincaid1975flesch}
+30. Kincaid J. P., Fishburne Jr R. P., Rogers R. L., \& Chissom B. S.
+(1975). \emph{Derivation of new readability formulas (automated
+readability index, fog count and flesch reading ease formula) for navy
+enlisted personnel}.
 
 \end{CSLReferences}
 
 \newpage
 
-\section*{Appendices}\label{appendices}
-\addcontentsline{toc}{section}{Appendices}
+\section*{Appendix}\label{appendix}
+\addcontentsline{toc}{section}{Appendix}
 
 \subsection*{Keyword Generation and Subreddit Selection
 Details}\label{keyword-generation-and-subreddit-selection-details}
@@ -1200,16 +1300,16 @@ Selection Details}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-0 & funny & 66604854 & ... & False & any \\
-1 & AskReddit & 53169243 & ... & False & self \\
-2 & gaming & 46005690 & ... & False & any \\
-3 & worldnews & 44847466 & ... & False & link \\
-4 & todayilearned & 40125637 & ... & False & link \\
-5 & aww & 37645187 & ... & False & link \\
-6 & Music & 36991965 & ... & False & any \\
-7 & memes & 35397966 & ... & False & link \\
-8 & movies & 34851952 & ... & False & any \\
-9 & Showerthoughts & 34152969 & ... & False & self \\
+0 & funny & 66606333 & ... & False & any \\
+1 & AskReddit & 53187135 & ... & False & self \\
+2 & gaming & 46011600 & ... & False & any \\
+3 & worldnews & 44854924 & ... & False & link \\
+4 & todayilearned & 40129819 & ... & False & link \\
+5 & aww & 37646001 & ... & False & link \\
+6 & Music & 36997898 & ... & False & any \\
+7 & memes & 35398685 & ... & False & link \\
+8 & movies & 34857549 & ... & False & any \\
+9 & Showerthoughts & 34153828 & ... & False & self \\
 \end{longtable}
 
 \begin{Shaded}
@@ -1278,41 +1378,255 @@ facts bias propaganda conspiracy agenda
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-0 & worldnews & 44847466 & link & 9 \\
-1 & technology & 18520150 & link & 9 \\
-2 & IndiaSpeaks & 1049211 & any & 9 \\
-3 & news & 29802412 & link & 8 \\
-4 & pcmasterrace & 14764738 & any & 8 \\
-5 & politics & 8785328 & link & 8 \\
-6 & movies & 34851952 & any & 7 \\
-7 & science & 33804429 & link & 7 \\
-8 & askscience & 26054520 & self & 7 \\
-9 & AmItheAsshole & 24117454 & self & 7 \\
+0 & worldnews & 44854924 & link & 9 \\
+1 & technology & 18525637 & link & 9 \\
+2 & IndiaSpeaks & 1049500 & any & 9 \\
+3 & news & 29805254 & link & 8 \\
+4 & pcmasterrace & 14768233 & any & 8 \\
+5 & politics & 8785629 & link & 8 \\
+6 & movies & 34857549 & any & 7 \\
+7 & science & 33806399 & link & 7 \\
+8 & askscience & 26054617 & self & 7 \\
+9 & AmItheAsshole & 24119019 & self & 7 \\
 \end{longtable}
 
-\subsection*{Figures and Tables}\label{figures-and-tables}
-\addcontentsline{toc}{subsection}{Figures and Tables}
+\subsection*{Prompt for LLM-based Word Clouds and Sentiment
+Analysis}\label{prompt-for-llm-based-word-clouds-and-sentiment-analysis}
+\addcontentsline{toc}{subsection}{Prompt for LLM-based Word Clouds and
+Sentiment Analysis}
 
-\textbf{Figure 1: Word Cloud for /r/politics} \emph{(See Appendix B,
-Figure 1 in the original notebook)}
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ os}
+\ImportTok{import}\NormalTok{ pandas }\ImportTok{as}\NormalTok{ pd}
+\ImportTok{import}\NormalTok{ matplotlib.pyplot }\ImportTok{as}\NormalTok{ plt}
+\ImportTok{from}\NormalTok{ google }\ImportTok{import}\NormalTok{ genai}
+\ImportTok{from}\NormalTok{ google.genai }\ImportTok{import}\NormalTok{ types}
+\ImportTok{from}\NormalTok{ wordcloud }\ImportTok{import}\NormalTok{ WordCloud}
+\ImportTok{import}\NormalTok{ random}
 
-\textbf{Figure 2: Word Cloud for /r/worldnews} \emph{(See Appendix B,
-Figure 2 in the original notebook)}
+\CommentTok{\# {-}{-}{-}{-}{-} Step 1: Extract Top 5 Subreddits from ml\_features {-}{-}{-}{-}{-}}
+\CommentTok{\# Assume ml\_features is already in your environment.}
+\NormalTok{top\_subreddits }\OperatorTok{=}\NormalTok{ ml\_features[}\StringTok{\textquotesingle{}subreddit\textquotesingle{}}\NormalTok{].value\_counts().head(}\DecValTok{5}\NormalTok{).index.tolist()}
 
-\textbf{Figure 3: Word Cloud for /r/news} \emph{(See Appendix B, Figure
-3 in the original notebook)}
+\CommentTok{\# {-}{-}{-}{-}{-} Step 2: Stratified Sampling {-}{-}{-}{-}{-} }
+\NormalTok{sampled\_comments }\OperatorTok{=}\NormalTok{ \{\}}
+\NormalTok{sample\_size }\OperatorTok{=} \DecValTok{100}
+\ControlFlowTok{for}\NormalTok{ subreddit }\KeywordTok{in}\NormalTok{ top\_subreddits:}
+\NormalTok{    subreddit\_comments }\OperatorTok{=}\NormalTok{ ml\_features[ml\_features[}\StringTok{\textquotesingle{}subreddit\textquotesingle{}}\NormalTok{] }\OperatorTok{==}\NormalTok{ subreddit][}\StringTok{\textquotesingle{}comment\_body\textquotesingle{}}\NormalTok{]}
+    \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(subreddit\_comments) }\OperatorTok{\textgreater{}}\NormalTok{ sample\_size:}
+\NormalTok{        sampled }\OperatorTok{=}\NormalTok{ subreddit\_comments.sample(n}\OperatorTok{=}\NormalTok{sample\_size, random\_state}\OperatorTok{=}\DecValTok{42}\NormalTok{)}
+    \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{        sampled }\OperatorTok{=}\NormalTok{ subreddit\_comments}
+\NormalTok{    sampled\_comments[subreddit] }\OperatorTok{=}\NormalTok{ sampled.tolist()}
 
-\textbf{Figure 4: Word Cloud for /r/technology} \emph{(See Appendix B,
-Figure 4 in the original notebook)}
+\CommentTok{\# {-}{-}{-}{-}{-} Step 3: Gemini API generate() Function {-}{-}{-}{-}{-}}
+\KeywordTok{def}\NormalTok{ generate(prompt):}
+\NormalTok{    client }\OperatorTok{=}\NormalTok{ genai.Client(}
+\NormalTok{        api\_key}\OperatorTok{=}\NormalTok{os.getenv(}\StringTok{"GEMINI\_API\_KEY"}\NormalTok{),}
+\NormalTok{    )}
+\NormalTok{    model }\OperatorTok{=} \StringTok{"gemini{-}2.0{-}flash"}
+\NormalTok{    contents }\OperatorTok{=}\NormalTok{ [}
+\NormalTok{        types.Content(}
+\NormalTok{            role}\OperatorTok{=}\StringTok{"user"}\NormalTok{,}
+\NormalTok{            parts}\OperatorTok{=}\NormalTok{[}
+\NormalTok{                types.Part.from\_text(text}\OperatorTok{=}\NormalTok{prompt),}
+\NormalTok{            ],}
+\NormalTok{        ),}
+\NormalTok{    ]}
+\NormalTok{    generate\_content\_config }\OperatorTok{=}\NormalTok{ types.GenerateContentConfig(}
+\NormalTok{        temperature}\OperatorTok{=}\DecValTok{0}\NormalTok{,}
+\NormalTok{        top\_p}\OperatorTok{=}\DecValTok{0}\NormalTok{,}
+\NormalTok{        top\_k}\OperatorTok{=}\DecValTok{1}\NormalTok{,}
+\NormalTok{        max\_output\_tokens}\OperatorTok{=}\DecValTok{8192}\NormalTok{,}
+\NormalTok{        response\_mime\_type}\OperatorTok{=}\StringTok{"text/plain"}\NormalTok{,}
+\NormalTok{    )}
+\NormalTok{    complete\_response }\OperatorTok{=} \StringTok{""}
+    \ControlFlowTok{for}\NormalTok{ chunk }\KeywordTok{in}\NormalTok{ client.models.generate\_content\_stream(}
+\NormalTok{        model}\OperatorTok{=}\NormalTok{model,}
+\NormalTok{        contents}\OperatorTok{=}\NormalTok{contents,}
+\NormalTok{        config}\OperatorTok{=}\NormalTok{generate\_content\_config,}
+\NormalTok{    ):}
+\NormalTok{        complete\_response }\OperatorTok{+=}\NormalTok{ chunk.text}
+    \ControlFlowTok{return}\NormalTok{ complete\_response.strip()}
 
-\textbf{Figure 5: Word Cloud for /r/science} \emph{(See Appendix B,
-Figure 5 in the original notebook)}
+\CommentTok{\# {-}{-}{-}{-}{-} Step 4: Query the LLM for Each Subreddit {-}{-}{-}{-}{-}}
+\NormalTok{subreddit\_responses }\OperatorTok{=}\NormalTok{ \{\}}
+\ControlFlowTok{for}\NormalTok{ subreddit, comments }\KeywordTok{in}\NormalTok{ sampled\_comments.items():}
+    \CommentTok{\# Take a random sample of comments if there are too many}
+    \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(}\StringTok{" "}\NormalTok{.join(comments)) }\OperatorTok{\textgreater{}} \DecValTok{4000}\NormalTok{:}
+\NormalTok{        random.seed(}\DecValTok{42}\NormalTok{)  }\CommentTok{\# For reproducibility}
+\NormalTok{        sampled\_comments }\OperatorTok{=}\NormalTok{ random.sample(comments, }\BuiltInTok{min}\NormalTok{(}\BuiltInTok{len}\NormalTok{(comments), }\DecValTok{50}\NormalTok{))}
+\NormalTok{        text\_blob }\OperatorTok{=} \StringTok{" "}\NormalTok{.join(sampled\_comments)[:}\DecValTok{4000}\NormalTok{]}
+    \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{        text\_blob }\OperatorTok{=} \StringTok{" "}\NormalTok{.join(comments)[:}\DecValTok{4000}\NormalTok{]}
+\NormalTok{    prompt }\OperatorTok{=}\NormalTok{ (}
+        \SpecialStringTok{f"Perform sentiment analysis on the following comments from subreddit /r/}\SpecialCharTok{\{}\NormalTok{subreddit}\SpecialCharTok{\}}\SpecialStringTok{. "}
+        \StringTok{"Identify 20 unique keywords (based exclusively on the text you are fed) that capture the essence of this subreddit (which can later be used for word clouds), and provide a brief sentiment summary (e.g. note if the overall tone is positive, negative, or neutral). "}
+        \StringTok{"At the end, on a new separate line, output exactly: \textquotesingle{}Keywords: keyword1, keyword2, etc.\textquotesingle{} followed by a comma{-}separated list of the keywords, with no extra text.}\CharTok{\textbackslash{}n\textbackslash{}n}\StringTok{Comments:}\CharTok{\textbackslash{}n}\StringTok{"} 
+        \OperatorTok{+}\NormalTok{ text\_blob}
+\NormalTok{    )}
+\NormalTok{    response }\OperatorTok{=}\NormalTok{ generate(prompt)}
+\NormalTok{    subreddit\_responses[subreddit] }\OperatorTok{=}\NormalTok{ response}
+    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"/r/}\SpecialCharTok{\{}\NormalTok{subreddit}\SpecialCharTok{\}}\SpecialStringTok{ Response:}\CharTok{\textbackslash{}n}\SpecialCharTok{\{}\NormalTok{response}\SpecialCharTok{\}}\CharTok{\textbackslash{}n}\SpecialCharTok{\{}\StringTok{\textquotesingle{}{-}\textquotesingle{}}\OperatorTok{*}\DecValTok{60}\SpecialCharTok{\}}\CharTok{\textbackslash{}n}\SpecialStringTok{"}\NormalTok{)}
 
-\textbf{Figure 6: Confusion Matrix for SVM Classifier} \emph{(See
-Appendix B, Figure 7 in the original notebook)}
+\CommentTok{\# {-}{-}{-}{-}{-} Step 5: Extract Keywords and Build Word Clouds {-}{-}{-}{-}{-}}
+\ControlFlowTok{for}\NormalTok{ subreddit, response }\KeywordTok{in}\NormalTok{ subreddit\_responses.items():}
+\NormalTok{    keywords\_line }\OperatorTok{=} \VariableTok{None}
+    \ControlFlowTok{for}\NormalTok{ line }\KeywordTok{in}\NormalTok{ response.splitlines():}
+        \ControlFlowTok{if}\NormalTok{ line.strip().startswith(}\StringTok{"Keywords:"}\NormalTok{):}
+\NormalTok{            keywords\_line }\OperatorTok{=}\NormalTok{ line.strip()}
+            \ControlFlowTok{break}
+    \ControlFlowTok{if}\NormalTok{ keywords\_line:}
+        \CommentTok{\# Remove the "Keywords:" prefix and extra spaces, then split by commas.}
+\NormalTok{        keywords\_part }\OperatorTok{=}\NormalTok{ keywords\_line[}\BuiltInTok{len}\NormalTok{(}\StringTok{"Keywords:"}\NormalTok{):].strip()}
+\NormalTok{        keywords }\OperatorTok{=}\NormalTok{ [kw.strip() }\ControlFlowTok{for}\NormalTok{ kw }\KeywordTok{in}\NormalTok{ keywords\_part.split(}\StringTok{","}\NormalTok{) }\ControlFlowTok{if}\NormalTok{ kw.strip()]}
+    \ControlFlowTok{else}\NormalTok{:}
+\NormalTok{        keywords }\OperatorTok{=}\NormalTok{ []}
+    
+    \ControlFlowTok{if}\NormalTok{ keywords:}
+        \CommentTok{\# Create a text blob from keywords for word cloud generation.}
+\NormalTok{        wordcloud\_text }\OperatorTok{=} \StringTok{" "}\NormalTok{.join(keywords)}
+\NormalTok{        wc }\OperatorTok{=}\NormalTok{ WordCloud(width}\OperatorTok{=}\DecValTok{800}\NormalTok{, height}\OperatorTok{=}\DecValTok{400}\NormalTok{, background\_color}\OperatorTok{=}\StringTok{\textquotesingle{}white\textquotesingle{}}\NormalTok{, min\_word\_length}\OperatorTok{=}\DecValTok{3}\NormalTok{).generate(wordcloud\_text)}
+\NormalTok{        plt.figure(figsize}\OperatorTok{=}\NormalTok{(}\DecValTok{8}\NormalTok{, }\DecValTok{4}\NormalTok{))}
+\NormalTok{        plt.imshow(wc, interpolation}\OperatorTok{=}\StringTok{"bilinear"}\NormalTok{)}
+\NormalTok{        plt.axis(}\StringTok{"off"}\NormalTok{)}
+\NormalTok{        plt.title(}\SpecialStringTok{f"/r/}\SpecialCharTok{\{}\NormalTok{subreddit}\SpecialCharTok{\}}\SpecialStringTok{ Word Cloud"}\NormalTok{)}
+\NormalTok{        plt.show()}
+    \ControlFlowTok{else}\NormalTok{:}
+        \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"No valid keywords extracted for /r/}\SpecialCharTok{\{}\NormalTok{subreddit}\SpecialCharTok{\}}\SpecialStringTok{."}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
-\textbf{Figure 7: Confusion Matrix for Neural Network Classifier}
-\emph{(See Appendix B, Figure 8 in the original notebook)}
+\subsection*{Additional Figures}\label{additional-figures}
+\addcontentsline{toc}{subsection}{Additional Figures}
+
+\begin{figure}[H]
+
+{\centering \pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-27-output-1.pdf}}
+
+}
+
+\caption{Average Compound Sentiment Scores by subreddit. Higher score
+indicates a more positive sentiment.}
+
+\end{figure}%
+
+\begin{figure}
+
+\begin{minipage}{0.50\linewidth}
+
+\pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-29-output-3.pdf}}
+
+\subcaption{\label{}r/worldnews}
+\end{minipage}%
+%
+\begin{minipage}{0.50\linewidth}
+
+\pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-29-output-4.pdf}}
+
+\subcaption{\label{}r/news}
+\end{minipage}%
+\newline
+\begin{minipage}{0.50\linewidth}
+
+\pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-29-output-5.pdf}}
+
+\subcaption{\label{}r/technology}
+\end{minipage}%
+%
+\begin{minipage}{0.50\linewidth}
+
+\pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-29-output-6.pdf}}
+
+\subcaption{\label{}r/science}
+\end{minipage}%
+
+\caption{\label{fig-wordclouds-gemini}Word Clouds generated by Gemini
+for the 4 subreddits that were not shown in the main document body.}
+
+\end{figure}%
+
+\begin{figure}
+
+\begin{minipage}{0.33\linewidth}
+
+\pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-27-output-3.pdf}}
+
+\subcaption{\label{}r/politics}
+\end{minipage}%
+%
+\begin{minipage}{0.33\linewidth}
+
+\pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-27-output-6.pdf}}
+
+\subcaption{\label{}r/worldnews}
+\end{minipage}%
+%
+\begin{minipage}{0.33\linewidth}
+
+\pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-27-output-2.pdf}}
+
+\subcaption{\label{}r/news}
+\end{minipage}%
+\newline
+\begin{minipage}{0.33\linewidth}
+
+\pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-27-output-5.pdf}}
+
+\subcaption{\label{}r/technology}
+\end{minipage}%
+%
+\begin{minipage}{0.33\linewidth}
+
+\pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-27-output-4.pdf}}
+
+\subcaption{\label{}r/science}
+\end{minipage}%
+
+\caption{\label{fig-wordclouds-freq}Word Clouds generated by simply
+looking at word frequency for all 5 subreddits. You can notice that some
+words which do not appear specific to any one subreddit are more
+commonly shown here, informing the need for either a more sophisticated
+method of creating the word cloud, or simply the adoption of LLMs for
+Word Cloud generation.}
+
+\end{figure}%
+
+\begin{figure}[H]
+
+{\centering \pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-25-output-1.pdf}}
+
+}
+
+\caption{Simple metrics indicating lack of significant differences
+between users labeled as likely humans vs.~possible or likely bots. The
+text readability measure can be further explored in the code file or in
+its original source
+paper\textsuperscript{{[}\citeproc{ref-kincaid1975flesch}{30}{]}}.}
+
+\end{figure}%%
+\begin{figure}[H]
+
+{\centering \pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-25-output-2.pdf}}
+
+}
+
+\caption{Word Clouds (generated by simple text frequency analysis)
+showing that users and bots do not have significantly different term
+usage patterns.}
+
+\end{figure}%%
+\begin{figure}[H]
+
+{\centering \pandocbounded{\includegraphics[keepaspectratio]{detecting_bots_on_reddit_code_files/figure-pdf/cell-22-output-4.pdf}}
+
+}
+
+\caption{Performance of each of the 3 models in predicting heuristically
+labeled user class on a simple train/test split.}
+
+\end{figure}%
 
 
 
