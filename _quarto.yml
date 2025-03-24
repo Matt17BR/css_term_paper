@@ -1,14 +1,15 @@
 project:
-    title: Detecting Bots on Reddit
+    title: Exploring Bot Detection on Reddit
     output-dir: docs
-title: Detecting Bots on Reddit
-subtitle: Computational Social Science
+title: Exploring Bot Detection on Reddit
+subtitle: Computational Social Science WS2024/25
 author: Matteo Mazzarelli
 date: today
 date-format: long
 format:
     pdf:
         number-sections: true
+        toc: true
         include-in-header: extra/preamble.tex
         fontsize: 12pt
         linestretch: 1

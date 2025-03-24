@@ -69,6 +69,46 @@
 \fi
 \makeatother
 
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{241,243,245}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.40,0.45,0.13}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.28,0.35,0.67}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.46,0.62}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.07,0.07,0.07}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
 
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
@@ -200,13 +240,19 @@
   \apptocmd{\@title}{\par {\large #1 \par}}{}{}
 }
 \makeatother
-\subtitle{Computational Social Science}
+\subtitle{Computational Social Science WS2024/25}
 \author{Matteo Mazzarelli}
 \date{March 24, 2025}
 
 \begin{document}
 \maketitle
 
+\renewcommand*\contentsname{Table of contents}
+{
+\hypersetup{linkcolor=}
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
 
 \setstretch{1}
 \section{Introduction}\label{introduction}
@@ -241,12 +287,11 @@ platform's credibility as a space for authentic discussion and
 information sharing. Secondly, the development of effective bot
 detection methods is essential to mitigate the potential negative
 impacts of bots, such as the spread of misinformation and the
-manipulation of public opinion. Finally, this research contributes to
-the broader scholarly literature on social media bot detection by
-focusing on Reddit, a platform with unique characteristics that may
-require tailored detection strategies. Previous research has explored
-various methods for bot detection on social media, often focusing on
-platforms like
+manipulation of public opinion. This research adds to the existing
+knowledge on identifying social media bots by specifically examining
+Reddit, a platform with unique characteristics that may require tailored
+detection strategies. Previous research has explored various methods for
+bot detection on social media, often focusing on platforms like
 Twitter\textsuperscript{{[}\citeproc{ref-redditbotwatch}{3},\citeproc{ref-multibotdetector}{4}{]}}.
 However, Reddit's community-driven structure and specific user behaviors
 necessitate a dedicated investigation into bot detection within this
@@ -359,8 +404,9 @@ challenges posed by bot activity on Reddit.
 \subsection{Data}\label{data}
 
 The data for this study was collected using the Reddit API via the
-Python Reddit API Wrapper (PRAW). The collection period spanned March
-23, 2025. The unit of analysis is individual Reddit comments.
+Python Reddit API Wrapper (PRAW). The final data collection period
+spanned March 21 and 22, 2025. The unit of analysis is individual Reddit
+comments, as well as the users posting them.
 
 \textbf{Subreddit Selection:} Subreddits were selected based on their
 high subscriber counts and relevance to topics frequently targeted by
@@ -373,9 +419,11 @@ generation). Based on these keywords and subscriber counts, a scoring
 system was developed to rank subreddits by their potential vulnerability
 to bot influence. (See Appendix A.2 for the scoring system and selected
 subreddits). The top 10 subreddits according to this scoring system were
-initially considered. For in-depth analysis and LLM querying, the top 5
-subreddits with the highest bot influence scores were chosen:
-r/worldnews, r/news, r/politics, r/science, and r/technology.
+initially considered. For in-depth analysis and LLM querying, 5
+subreddits with high bot influence scores were chosen: r/worldnews,
+r/news, r/politics, r/science, and r/technology, as they are
+representative of discussion topics that are likely to be targeted by
+bots.
 
 \textbf{Data Collection Procedure:} For each selected subreddit, the
 Reddit API was used to collect posts and associated comments. The data
@@ -397,13 +445,13 @@ collected included:
   and link karma) were collected.
 \end{itemize}
 
-To manage data volume and processing time, the number of posts and
-comments collected were limited. For each subreddit, the 50 hottest
-posts were fetched, and for each post, a maximum of 2000 comments were
-collected recursively, encompassing all comment levels. This
-hierarchical approach aimed to capture a representative sample of
-discussions within each subreddit while managing computational
-resources.
+To manage data volume and processing time, as well as to respect API
+limitations, the number of posts and comments collected were limited.
+For each subreddit, the 50 hottest posts were fetched, and for each
+post, a maximum of 2000 comments were collected recursively,
+encompassing all comment levels. This hierarchical approach aimed to
+capture a representative sample of discussions within each subreddit
+while managing computational resources.
 
 \subsection{Measurement}\label{measurement}
 
@@ -414,7 +462,7 @@ they exhibited a combination of the following characteristics:
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Young Account Age:} Accounts less than a year old were
+  \textbf{Young Account Age:} Accounts less than a week old were
   considered potentially bot-like.
 \item
   \textbf{Unusual Karma:} Accounts with unusually low or high karma
@@ -423,8 +471,8 @@ they exhibited a combination of the following characteristics:
   distribution.
 \item
   \textbf{High Posting Frequency:} Accounts with exceptionally high
-  posting frequency, particularly commenting in multiple subreddits
-  within short time intervals, were considered suspicious.
+  posting frequency, commenting multiple times within unusually short
+  time intervals, were considered suspicious.
 \item
   \textbf{Repetitive Content:} Accounts frequently posting or commenting
   with highly similar or identical text were flagged for repetitive
@@ -433,8 +481,10 @@ they exhibited a combination of the following characteristics:
 \item
   \textbf{Em-dash Presence:} The presence of em-dashes (---) in comments
   was considered as a potential indicator of AI-generated content, as
-  some AI models tend to overuse this punctuation
-  mark\textsuperscript{{[}\citeproc{ref-redditbotdetector}{12}--\citeproc{ref-nightwateremdash}{14}{]}}.
+  some AI models tend to overuse this punctuation mark, which is not
+  usually present in human writing due to its difficulty in being typed
+  on a normal
+  keyboard\textsuperscript{{[}\citeproc{ref-redditbotdetector}{12}--\citeproc{ref-nightwateremdash}{14}{]}}.
 \end{itemize}
 
 These heuristics were chosen based on common bot characteristics
@@ -445,20 +495,10 @@ markers\textsuperscript{{[}\citeproc{ref-redditbotdetector}{12}--\citeproc{ref-n
 A ``Bot Score'' was calculated for each account based on the number of
 heuristics triggered. Accounts exceeding a certain threshold on the
 ``Bot Score'' were classified as ``possible bots'' or ``very likely
-bots,'' allowing for varying degrees of bot likelihood assessment. (See
-code for precise implementation of heuristic thresholds and scoring). It
-is important to note that these heuristics primarily rely on
-meta-metrics and basic content features like punctuation, and do not
-deeply analyze the semantic content of the comments themselves.
-
-\textbf{Narrative Amplification:} Narrative amplification was measured
-by analyzing the frequency of keywords associated with potentially
-bot-driven narratives within subreddit discussions. Keywords related to
-bot-influenced topics (e.g., politics, controversial issues) were
-generated using Google Gemini (see Appendix A.1). The frequency of these
-keywords in comments from accounts flagged as potential bots was
-compared to their frequency in comments from non-flagged accounts to
-assess potential narrative amplification.
+bots'' allowing for varying degrees of bot likelihood assessment. It is
+important to note that these heuristics primarily rely on meta-metrics
+and basic content features like punctuation, and do not deeply analyze
+the semantic content of the comments themselves.
 
 \textbf{Polarization:} Polarization was assessed using sentiment
 analysis of comment content. The VADER (Valence Aware Dictionary and
@@ -479,11 +519,10 @@ their implementation are detailed in the ``Measurement'' section above
 and in the provided code.
 
 \textbf{Large Language Model (LLM) for Keyword Extraction and Sentiment
-Summarization:} Google Gemini, a state-of-the-art LLM, was utilized to
+Summarization:} Google Gemini, a state-of-the-art LLM, configured for
+deterministic output (temperature parameter set to 0), was utilized to
 extract keywords and generate sentiment summaries for comments within
-each of the top 5 subreddits. The \texttt{generate} function, configured
-for deterministic output (temperature=0, top\_p=0, top\_k=1), was used
-to query Gemini. The prompt provided to Gemini requested:
+each of the 5 subreddits. The prompt provided to Gemini requested:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -491,7 +530,7 @@ to query Gemini. The prompt provided to Gemini requested:
 \item
   \textbf{Keyword Extraction:} Identification of 20 unique keywords
   capturing the essence of each subreddit's discussions, based
-  exclusively on a sample of comments.
+  exclusively on a large sample of comments.
 \item
   \textbf{Sentiment Summary:} A brief summary of the overall sentiment
   expressed in the comments, indicating whether the tone was positive,
@@ -504,7 +543,8 @@ the extracted keywords to visually represent the dominant themes within
 each subreddit's discussions. It's important to note that while LLMs are
 used here for analysis, they are not directly integrated into the
 heuristic bot detection model itself, and their role is primarily
-exploratory in this study.
+exploratory in this study, as it is not possible to produce a fully
+deterministic result by querying a LLM.
 
 \textbf{Evaluation of Bot Detection Effectiveness:} The effectiveness of
 the heuristic-based bot detection method was evaluated both
@@ -523,27 +563,26 @@ qualitatively and quantitatively.
 \item
   \textbf{Quantitative Evaluation (Exploratory):} To explore the
   potential for quantitative evaluation, simple classification models
-  (Random Forest, SVM, Neural Network) were trained using features
-  derived from the heuristic analysis (Bot Score, account age, karma,
-  posting frequency, content repetitiveness, em-dash presence, etc.).
-  The performance of these models was assessed using standard
-  classification metrics (accuracy, precision, recall, F1-score,
-  confusion matrices) and cross-validation. This quantitative evaluation
-  was exploratory, given the lack of a true ``ground truth'' dataset for
-  bot identification in this study and the limitation of relying solely
-  on meta-metrics and basic content features without labeled content
-  data. It aimed to provide a preliminary indication of the
-  heuristic-based approach's predictive capability and guide future
-  research directions involving more rigorous machine learning
-  evaluation that incorporates content-based features from labeled data.
+  (Random Forest, SVM, Neural Network, all left untuned) were trained
+  using features derived from the heuristic analysis (Bot Score, account
+  age, karma, posting frequency, content repetitiveness, em-dash
+  presence, etc.). The performance of these models was assessed using
+  standard classification metrics. This quantitative evaluation was
+  exploratory, given the lack of a true ``ground truth'' dataset for bot
+  identification in this study and the limitation of relying solely on
+  meta-metrics and basic content features without labeled content data.
+  It aimed to provide a preliminary indication of the heuristic-based
+  approach's predictive capability and guide future research directions
+  involving more rigorous machine learning evaluation that incorporates
+  content-based features from labeled data.
 \end{itemize}
 
 \subsection{Reproducibility}\label{reproducibility}
 
-To ensure the reproducibility of this research, all code used for data
+To ensure the (partial, given the nature of the usage of LLMs at various
+points) reproducibility of this research, all code used for data
 collection, analysis, and model implementation is provided in the
-supplementary materials (``Surname\_Firstname\_code.R'' and
-``Surname\_Firstname\_code.do''). The code includes:
+supplementary materials. The code includes:
 
 \begin{itemize}
 \tightlist
@@ -565,15 +604,10 @@ supplementary materials (``Surname\_Firstname\_code.R'' and
   evaluation.
 \end{itemize}
 
-The ``Surname(s).zip'' folder also contains a ``data.csv'' file, which
-is a sample of the raw data collected from Reddit. Due to the constantly
-evolving nature of Reddit data and API access, the provided code may
-require minor adjustments to be executed perfectly ``out of the box'' at
-a future date. However, the code is designed to be as self-contained and
-well-commented as possible to facilitate replication by other
-researchers. The stochastic elements of LLM output are minimized by
-setting temperature and sampling parameters to ensure reproducible
-keyword generation.
+The code is designed to be as self-contained and well-commented as
+possible to facilitate replication by other researchers. The stochastic
+elements of LLM output are minimized by setting the temperature
+parameter to 0.
 
 \section{Empirical Results}\label{empirical-results}
 
@@ -777,7 +811,7 @@ predictive capability of the heuristic-based approach when relying on
 these meta-metrics and basic content features.
 
 However, and importantly, the analysis of keyword frequencies and
-sentiment scores did \textbf{not} reveal statistically significant
+sentiment scores did \emph{not} reveal statistically significant
 differences between flagged and non-flagged accounts. This key finding
 suggests that, while heuristic methods based on meta-metrics can
 identify certain bot-like accounts, these bots may be increasingly
@@ -786,10 +820,10 @@ sentiment expression, at least when analyzed using simple keyword
 frequency and sentiment analysis tools. This highlights a crucial
 limitation of relying solely on meta-metrics and basic content analysis
 for bot detection in the face of increasingly advanced automated
-accounts. \textbf{It also suggests that simply analyzing keyword
-frequencies or overall sentiment polarity may not be sufficient to
-distinguish bots from humans in terms of content, and more nuanced,
-context-aware content analysis methods are needed.}
+accounts. It also suggests that simply analyzing keyword frequencies or
+overall sentiment polarity may not be sufficient to distinguish bots
+from humans in terms of content, and more nuanced, context-aware content
+analysis methods are needed.
 
 The study also investigated potential narrative amplification and
 polarization associated with flagged accounts. While suggestive evidence
@@ -802,11 +836,11 @@ thematically informative in visualizing subreddit topics, similarly did
 not provide clear differentiation between bot and human language use in
 terms of content.
 
-\textbf{In essence, the study demonstrates that while basic heuristics
-can flag accounts exhibiting bot-like \emph{behavior}, these heuristics
-alone are insufficient to definitively identify bots or understand their
-influence on \emph{content} without more advanced content-based analysis
-methods and labeled data.}
+In essence, the study demonstrates that while basic heuristics can flag
+accounts exhibiting bot-like behavior, these heuristics alone are
+insufficient to definitively identify bots or understand their influence
+on content without more advanced content-based analysis methods and
+labeled data.
 
 \subsection{Limitations}\label{limitations}
 
@@ -828,24 +862,23 @@ interpreting the findings:
   positives, indicating that the heuristics may inadvertently flag some
   legitimate users as bots. Crucially, the lack of significant
   differences in keyword frequencies and sentiment scores suggests that
-  \textbf{meta-metrics alone are insufficient for a comprehensive and
-  nuanced understanding of bot activity, and that content-based analysis
-  is essential for future progress.}
+  meta-metrics alone are insufficient for a comprehensive and nuanced
+  understanding of bot activity, and that content-based analysis is
+  essential for future progress.
 \item
   \textbf{Lack of Ground Truth and Content Labeling:} The absence of a
   true ``ground truth'' dataset for bot identification on Reddit poses a
   significant challenge for rigorous quantitative evaluation. Moreover,
-  the study \textbf{did not incorporate a crucial element for
-  content-based bot detection: labeled data where comment bodies are
-  categorized as bot-generated or human-generated.} The exploratory
-  machine learning evaluation provides only a preliminary indication of
-  the heuristic approach's predictive capability based on meta-metrics
-  but cannot definitively assess its accuracy against a verified
-  bot/human classification that incorporates content analysis.
-  \textbf{Future research must prioritize the creation of such labeled
-  datasets, potentially through human annotation or LLM-assisted
-  labeling, to enable the development of more robust content-aware bot
-  detection models.}
+  the study did not incorporate a crucial element for content-based bot
+  detection: labeled data where comment bodies are categorized as
+  bot-generated or human-generated. The exploratory machine learning
+  evaluation provides only a preliminary indication of the heuristic
+  approach's predictive capability based on meta-metrics but cannot
+  definitively assess its accuracy against a verified bot/human
+  classification that incorporates content analysis. Future research
+  must prioritize the creation of such labeled datasets, potentially
+  through human annotation or LLM-assisted labeling, to enable the
+  development of more robust content-aware bot detection models.
 \item
   \textbf{Data Sampling:} The data collection was limited to the top 50
   hottest posts per subreddit and a maximum of 2000 comments per post.
@@ -875,43 +908,43 @@ meta-metrics and incorporating content-based analysis:
 \item
   \textbf{Refinement of Heuristics and Integration of Content Features:}
   Further research is needed to refine and expand the heuristic-based
-  bot detection method, \textbf{integrating content-based features
-  derived from labeled data.} This could involve incorporating more
-  sophisticated meta-metrics, such as network-based metrics derived from
-  user interaction patterns within subreddits, \textbf{but crucially, it
-  should also prioritize features extracted directly from the comment
-  text itself, leveraging human-validated labeled data to identify
-  nuanced linguistic patterns indicative of bot-generated content, going
-  beyond simple metrics like em-dash presence to encompass stylistic
-  features, semantic coherence, contextual relevance, and even subtle
-  cues in argumentation and conversational style.} Adaptive heuristics
-  that dynamically adjust to evolving bot behaviors, \textbf{including
-  content generation strategies}, could also be explored.
+  bot detection method, integrating content-based features derived from
+  labeled data. This could involve incorporating more sophisticated
+  meta-metrics, such as network-based metrics derived from user
+  interaction patterns within subreddits, but crucially, it should also
+  prioritize features extracted directly from the comment text itself,
+  leveraging human-validated labeled data to identify nuanced linguistic
+  patterns indicative of bot-generated content, going beyond simple
+  metrics like em-dash presence to encompass stylistic features,
+  semantic coherence, contextual relevance, and even subtle cues in
+  argumentation and conversational style. Adaptive heuristics that
+  dynamically adjust to evolving bot behaviors, including content
+  generation strategies, could also be explored.
 \item
   \textbf{Development of Ground Truth Datasets with Human-Validated
   Content Labels:} A critical step for future research is the
   development of high-quality, labeled datasets for Reddit bot detection
-  \textbf{that include human-validated labels for comment content.} This
-  could involve combining manual labeling by expert Reddit moderators
-  with \textbf{LLM-assisted labeling techniques to categorize comment
-  bodies as bot or human-generated, with a rigorous human review and
-  validation process to ensure label accuracy and minimize biases.} This
-  labeled data is essential to train and evaluate models that can
-  effectively leverage content-based features for bot detection, moving
-  beyond the limitations of meta-metrics and basic content features.
+  that include human-validated labels for comment content. This could
+  involve combining manual labeling by expert Reddit moderators with
+  LLM-assisted labeling techniques to categorize comment bodies as bot
+  or human-generated, with a rigorous human review and validation
+  process to ensure label accuracy and minimize biases. This labeled
+  data is essential to train and evaluate models that can effectively
+  leverage content-based features for bot detection, moving beyond the
+  limitations of meta-metrics and basic content features.
 \item
   \textbf{Advanced Machine Learning Models for Content-Aware Bot
   Detection:} Future studies should investigate the application of more
   advanced machine learning models, including deep learning
-  architectures and graph neural networks, \textbf{trained on datasets
-  with human-validated content labels}, for Reddit bot detection. These
+  architectures and graph neural networks, trained on datasets with
+  human-validated content labels, for Reddit bot detection. These
   models, capable of processing and understanding natural language, may
   be better suited to capture the complex behavioral and linguistic
   patterns of sophisticated bots and potentially improve detection
-  accuracy \textbf{by learning directly from the content of bot and
-  human comments, going beyond simple keyword or sentiment analysis to
+  accuracy by learning directly from the content of bot and human
+  comments, going beyond simple keyword or sentiment analysis to
   understand deeper semantic, stylistic, and contextual cues that
-  differentiate human and bot-generated text.}
+  differentiate human and bot-generated text.
 \item
   \textbf{Hybrid Approaches Combining Meta-metrics and Content
   Analysis:} Combining heuristic-based methods, focused on meta-metrics,
@@ -919,27 +952,27 @@ meta-metrics and incorporating content-based analysis:
   offer a promising avenue for future research. Heuristics could be used
   for initial feature engineering and data pre-processing of meta-data,
   while machine learning models could be trained to learn more complex
-  patterns and improve detection accuracy \textbf{by incorporating both
+  patterns and improve detection accuracy by incorporating both
   meta-metric and content-based features derived from human-validated
   labeled data, creating a more robust and nuanced bot detection system
   that leverages the strengths of both rule-based and data-driven
-  approaches.}
+  approaches.
 \item
   \textbf{Real-time Bot Detection Systems with Content Analysis
   Capabilities and Ethical Considerations:} Developing real-time bot
   detection systems that can proactively identify and flag malicious
   activity on Reddit is a crucial direction for future work. This would
   require efficient and scalable algorithms capable of processing large
-  volumes of streaming Reddit data and \textbf{incorporating
-  sophisticated content analysis in real-time, potentially through
-  optimized and ethically vetted LLM-based feature extraction or
-  lightweight content classification models, while also carefully
-  addressing the computational cost, latency considerations, and ethical
-  implications of real-time content processing and automated bot
-  flagging.} \textbf{Ethical considerations, particularly regarding
-  potential biases in content labels and algorithmic detection, and the
-  need for transparency and user recourse mechanisms in content-based
-  bot detection systems, must be central to future development.}
+  volumes of streaming Reddit data and incorporating sophisticated
+  content analysis in real-time, potentially through optimized and
+  ethically vetted LLM-based feature extraction or lightweight content
+  classification models, while also carefully addressing the
+  computational cost, latency considerations, and ethical implications
+  of real-time content processing and automated bot flagging. Ethical
+  considerations, particularly regarding potential biases in content
+  labels and algorithmic detection, and the need for transparency and
+  user recourse mechanisms in content-based bot detection systems, must
+  be central to future development.
 \end{itemize}
 
 \subsection{Conclusion}\label{conclusion}
@@ -950,21 +983,24 @@ analysis. While heuristic-based approaches offer a readily implementable
 and interpretable starting point for identifying some bot-like accounts
 based on meta-metrics, the study highlights the crucial limitation of
 relying solely on meta-metrics and basic content analysis in the face of
-increasingly sophisticated bots. \textbf{The key takeaway is the
-necessity of moving beyond meta-metrics and incorporating
-human-validated content-based analysis, which requires the development
-of labeled datasets and the application of advanced machine learning
-models capable of understanding and learning from the textual content of
-Reddit comments, while carefully considering ethical implications and
-ensuring fairness and transparency.} Future research must prioritize
-these directions to develop more robust, accurate, ethically sound, and
+increasingly sophisticated bots. The key takeaway is the necessity of
+moving beyond meta-metrics and incorporating human-validated
+content-based analysis, which requires the development of labeled
+datasets and the application of advanced machine learning models capable
+of understanding and learning from the textual content of Reddit
+comments, while carefully considering ethical implications and ensuring
+fairness and transparency. Future research must prioritize these
+directions to develop more robust, accurate, ethically sound, and
 content-aware bot detection systems for this complex and evolving online
 environment. The ongoing effort to detect and mitigate bot influence,
 particularly through advanced content-aware methods, is crucial for
 maintaining the integrity and trustworthiness of online social platforms
 and ensuring a healthy digital public sphere.
 
-\subsection{References}\label{references}
+\newpage
+
+\section*{References}\label{references}
+\addcontentsline{toc}{section}{References}
 
 \phantomsection\label{refs}
 \begin{CSLReferences}{1}{0}
@@ -1053,20 +1089,112 @@ R/7daystodie. (2025). In \emph{Reddit}.
 
 \end{CSLReferences}
 
-\subsection{\texorpdfstring{\textbf{Appendices}}{Appendices}}\label{appendices}
+\newpage
 
-\textbf{Appendix A: Keyword Generation and Subreddit Selection Details}
+\section*{Appendices}\label{appendices}
+\addcontentsline{toc}{section}{Appendices}
 
-\textbf{A.1 Keyword Generation Code and Prompt}
+\subsection{Keyword Generation and Subreddit Selection
+Details}\label{keyword-generation-and-subreddit-selection-details}
 
-\emph{(See Appendix A.1 in the original notebook for code and prompt)}
+\begin{longtable}[]{@{}llllll@{}}
+\toprule\noalign{}
+& Name & Subscribers & ... & Over 18 & Submission Type \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & funny & 66604745 & ... & False & any \\
+1 & AskReddit & 53167980 & ... & False & self \\
+2 & gaming & 46005332 & ... & False & any \\
+3 & worldnews & 44846984 & ... & False & link \\
+4 & todayilearned & 40125373 & ... & False & link \\
+5 & aww & 37645128 & ... & False & link \\
+6 & Music & 36991602 & ... & False & any \\
+7 & memes & 35397927 & ... & False & link \\
+8 & movies & 34851629 & ... & False & any \\
+9 & Showerthoughts & 34152909 & ... & False & self \\
+\end{longtable}
 
-\textbf{A.2 Selected Subreddits and Scoring System}
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ ast}
 
-\emph{(See Appendix A.2 in the original notebook for selected subreddits
-table and scoring system description)}
+\NormalTok{response }\OperatorTok{=}\NormalTok{ generate(}\StringTok{"What are some keywords I can use to create a list of subreddits which are likely to be influenced by bots because of their controversial nature? These are keywords that I would look for within a subreddit\textquotesingle{}s name or description. For example: }\CharTok{\textbackslash{}"}\StringTok{news}\CharTok{\textbackslash{}"}\StringTok{, }\CharTok{\textbackslash{}"}\StringTok{politics}\CharTok{\textbackslash{}"}\StringTok{, }\CharTok{\textbackslash{}"}\StringTok{discussion}\CharTok{\textbackslash{}"}\StringTok{, }\CharTok{\textbackslash{}"}\StringTok{war}\CharTok{\textbackslash{}"}\StringTok{, }\CharTok{\textbackslash{}"}\StringTok{vaccines}\CharTok{\textbackslash{}"}\StringTok{, }\CharTok{\textbackslash{}"}\StringTok{controversial}\CharTok{\textbackslash{}"}\StringTok{, }\CharTok{\textbackslash{}"}\StringTok{conflict}\CharTok{\textbackslash{}"}\StringTok{, etc.}\CharTok{\textbackslash{}n\textbackslash{}n}\StringTok{Keep the answer short, only including 50 keywords and saving them in a python list as follows [}\CharTok{\textbackslash{}"}\StringTok{key1}\CharTok{\textbackslash{}"}\StringTok{,}\CharTok{\textbackslash{}"}\StringTok{key2}\CharTok{\textbackslash{}"}\StringTok{,...]. Send the output as text not as code."}\NormalTok{)}
 
-\textbf{Appendix B: Figures and Tables}
+\NormalTok{bot\_influence\_keywords }\OperatorTok{=}\NormalTok{ ast.literal\_eval(response.replace(}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\StringTok{""}\NormalTok{))}
+
+\ControlFlowTok{for}\NormalTok{ i }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{0}\NormalTok{, }\BuiltInTok{len}\NormalTok{(bot\_influence\_keywords), }\DecValTok{5}\NormalTok{):}
+    \BuiltInTok{print}\NormalTok{(}\OperatorTok{*}\NormalTok{bot\_influence\_keywords[i:i}\OperatorTok{+}\DecValTok{5}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+news politics discussion war vaccines
+controversial conflict debate election government
+rights freedom censorship truth conspiracy
+agenda propaganda opinion ideology activism
+resistance revolution socialism capitalism communism
+nationalism globalism immigration border crime
+justice police law gun religion
+atheism gender race identity climate
+energy economy finance markets technology
+science health security military foreign policy
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Score subreddits based on subscribers and keywords in description}
+\KeywordTok{def}\NormalTok{ calculate\_bot\_influence\_score(row):}
+\NormalTok{    score }\OperatorTok{=} \DecValTok{0}
+    
+    \CommentTok{\# Large subscriber base increases potential for bot activity}
+    \ControlFlowTok{if}\NormalTok{ row[}\StringTok{\textquotesingle{}Subscribers\textquotesingle{}}\NormalTok{] }\OperatorTok{\textgreater{}} \DecValTok{10000000}\NormalTok{:}
+\NormalTok{        score }\OperatorTok{+=} \DecValTok{5}
+    \ControlFlowTok{elif}\NormalTok{ row[}\StringTok{\textquotesingle{}Subscribers\textquotesingle{}}\NormalTok{] }\OperatorTok{\textgreater{}} \DecValTok{5000000}\NormalTok{:}
+\NormalTok{        score }\OperatorTok{+=} \DecValTok{4}
+    \ControlFlowTok{elif}\NormalTok{ row[}\StringTok{\textquotesingle{}Subscribers\textquotesingle{}}\NormalTok{] }\OperatorTok{\textgreater{}} \DecValTok{1000000}\NormalTok{:}
+\NormalTok{        score }\OperatorTok{+=} \DecValTok{3}
+        
+    \CommentTok{\# Check for keywords in description and subreddit name}
+\NormalTok{    description }\OperatorTok{=}\NormalTok{ row[}\StringTok{\textquotesingle{}Description\textquotesingle{}}\NormalTok{].lower()}
+\NormalTok{    sub\_name }\OperatorTok{=}\NormalTok{ row[}\StringTok{\textquotesingle{}Name\textquotesingle{}}\NormalTok{].lower()}
+    \ControlFlowTok{for}\NormalTok{ keyword }\KeywordTok{in}\NormalTok{ bot\_influence\_keywords:}
+        \ControlFlowTok{if}\NormalTok{ keyword }\KeywordTok{in}\NormalTok{ description:}
+\NormalTok{            score }\OperatorTok{+=} \DecValTok{1}
+        \ControlFlowTok{if}\NormalTok{ keyword }\KeywordTok{in}\NormalTok{ sub\_name:}
+\NormalTok{            score }\OperatorTok{+=} \DecValTok{1}
+            
+    \ControlFlowTok{return}\NormalTok{ score}
+
+\NormalTok{subs\_df[}\StringTok{\textquotesingle{}Bot Score\textquotesingle{}}\NormalTok{] }\OperatorTok{=}\NormalTok{ subs\_df.}\BuiltInTok{apply}\NormalTok{(calculate\_bot\_influence\_score, axis}\OperatorTok{=}\DecValTok{1}\NormalTok{)}
+
+\CommentTok{\# Get top 50 most vulnerable subreddits}
+\NormalTok{top\_vulnerable }\OperatorTok{=}\NormalTok{ subs\_df.nlargest(}\DecValTok{50}\NormalTok{, }\StringTok{\textquotesingle{}Bot Score\textquotesingle{}}\NormalTok{)[[}\StringTok{\textquotesingle{}Name\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Subscribers\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Submission Type\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Bot Score\textquotesingle{}}\NormalTok{]].reset\_index(drop}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+\NormalTok{top\_vulnerable.head(}\DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+& Name & Subscribers & Submission Type & Bot Score \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & technology & 18519821 & link & 9 \\
+1 & IndiaSpeaks & 1049207 & any & 9 \\
+2 & pcmasterrace & 14764569 & any & 8 \\
+3 & TwoXChromosomes & 13637497 & any & 8 \\
+4 & politics & 8785302 & link & 8 \\
+5 & worldnews & 44846984 & link & 7 \\
+6 & movies & 34851629 & any & 7 \\
+7 & science & 33804287 & link & 7 \\
+8 & news & 29802178 & link & 7 \\
+9 & askscience & 26054518 & self & 7 \\
+\end{longtable}
+
+\subsection{Figures and Tables}\label{figures-and-tables}
 
 \textbf{Figure 1: Word Cloud for /r/politics} \emph{(See Appendix B,
 Figure 1 in the original notebook)}

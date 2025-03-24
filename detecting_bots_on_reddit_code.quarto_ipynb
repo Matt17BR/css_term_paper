@@ -34,7 +34,7 @@
         "        ]\n",
         "    )"
       ],
-      "id": "2f070ddf",
+      "id": "1cb0d56e",
       "execution_count": null,
       "outputs": []
     },
@@ -83,7 +83,7 @@
         "\n",
         "    return complete_response"
       ],
-      "id": "4cdaafa6",
+      "id": "4ec8db85",
       "execution_count": null,
       "outputs": []
     },
@@ -118,7 +118,7 @@
         "# Print the top 10\n",
         "subs_df.head(10)"
       ],
-      "id": "286a1edb",
+      "id": "66b1e549",
       "execution_count": null,
       "outputs": []
     },
@@ -135,7 +135,7 @@
         "for i in range(0, len(bot_influence_keywords), 5):\n",
         "    print(*bot_influence_keywords[i:i+5])"
       ],
-      "id": "4ac1a51a",
+      "id": "bbb1159c",
       "execution_count": null,
       "outputs": []
     },
@@ -172,7 +172,7 @@
         "top_vulnerable = subs_df.nlargest(50, 'Bot Score')[['Name', 'Subscribers', 'Submission Type', 'Bot Score']].reset_index(drop=True)\n",
         "top_vulnerable.head(10)"
       ],
-      "id": "1c5823cb",
+      "id": "34382830",
       "execution_count": null,
       "outputs": []
     },
@@ -187,7 +187,7 @@
         "\n",
         "top_vulnerable_filtered"
       ],
-      "id": "07211e7d",
+      "id": "abb768ae",
       "execution_count": null,
       "outputs": []
     },
@@ -304,7 +304,7 @@
         "reddit_data_df.to_csv(\"reddit_posts_and_comments.csv\", index=False)\n",
         "comments_df.to_csv(\"comments.csv\", index=False)"
       ],
-      "id": "49946627",
+      "id": "f5a3a8bf",
       "execution_count": null,
       "outputs": []
     },
@@ -318,7 +318,7 @@
         "\n",
         "reddit_data_df.head(10)"
       ],
-      "id": "13319933",
+      "id": "7000bb22",
       "execution_count": null,
       "outputs": []
     },
@@ -331,7 +331,7 @@
         "\n",
         "comments_df.head(10)"
       ],
-      "id": "e5887472",
+      "id": "a322aac7",
       "execution_count": null,
       "outputs": []
     },
@@ -372,7 +372,7 @@
         "\n",
         "comments_df.head(10)"
       ],
-      "id": "15c6fb0e",
+      "id": "2eacb40d",
       "execution_count": null,
       "outputs": []
     },
@@ -478,7 +478,7 @@
         "\n",
         "comments_df.head(10)"
       ],
-      "id": "c16ccd8d",
+      "id": "c680b66f",
       "execution_count": null,
       "outputs": []
     },
@@ -528,7 +528,7 @@
         "\n",
         "recent_user_comments.head(10)"
       ],
-      "id": "b4415425",
+      "id": "8c58e469",
       "execution_count": null,
       "outputs": []
     },
@@ -542,7 +542,7 @@
         "\n",
         "processed_comments.head(10)"
       ],
-      "id": "12e8e56a",
+      "id": "52374e80",
       "execution_count": null,
       "outputs": []
     },
@@ -554,7 +554,7 @@
         "\n",
         "recent_user_comments.head(10)"
       ],
-      "id": "6b29f483",
+      "id": "da772b23",
       "execution_count": null,
       "outputs": []
     },
@@ -653,7 +653,7 @@
         "\n",
         "user_features_df.head(10)"
       ],
-      "id": "c39067a0",
+      "id": "4b08cf0f",
       "execution_count": null,
       "outputs": []
     },
@@ -668,7 +668,7 @@
         "\n",
         "processed_comments.head(10)"
       ],
-      "id": "cf1b7e1e",
+      "id": "7b8e1cc4",
       "execution_count": null,
       "outputs": []
     },
@@ -682,7 +682,7 @@
         "\n",
         "ml_features.head(10)"
       ],
-      "id": "4d9329bf",
+      "id": "9ab6e485",
       "execution_count": null,
       "outputs": []
     },
@@ -720,7 +720,7 @@
         "\n",
         "ml_features.head(10)"
       ],
-      "id": "2704dae0",
+      "id": "daaa164d",
       "execution_count": null,
       "outputs": []
     },
@@ -758,7 +758,7 @@
         "\n",
         "ml_features.head(10)"
       ],
-      "id": "2965f2c7",
+      "id": "c6cb50a6",
       "execution_count": null,
       "outputs": []
     },
@@ -796,7 +796,7 @@
         "\n",
         "ml_features.head(10)"
       ],
-      "id": "c752557a",
+      "id": "c1372138",
       "execution_count": null,
       "outputs": []
     },
@@ -951,7 +951,7 @@
         "    plt.tight_layout()\n",
         "    plt.show()"
       ],
-      "id": "701d5af2",
+      "id": "cab85318",
       "execution_count": null,
       "outputs": []
     },
@@ -1033,7 +1033,7 @@
         "pc1_label = f\"PC1 ({', '.join(pc1_top_features)})\"\n",
         "pc2_label = f\"PC2 ({', '.join(pc2_top_features)})\""
       ],
-      "id": "fb77b7a7",
+      "id": "8ac72a30",
       "execution_count": null,
       "outputs": []
     },
@@ -1059,7 +1059,7 @@
         "plt.tight_layout()\n",
         "plt.show()"
       ],
-      "id": "81eefe47",
+      "id": "2c66f66e",
       "execution_count": null,
       "outputs": []
     },
@@ -1305,7 +1305,7 @@
         "print(f\"Human Slang Usage Rate: {ml_features_filtered[ml_features_filtered['user_type'] == 'Human']['contains_slang'].mean():.2%}\")\n",
         "print(f\"Bot Slang Usage Rate: {ml_features_filtered[ml_features_filtered['user_type'] == 'Bot']['contains_slang'].mean():.2%}\")"
       ],
-      "id": "6d9beeea",
+      "id": "bced7bb0",
       "execution_count": null,
       "outputs": []
     },
@@ -1573,7 +1573,7 @@
         "print(f\"Human Slang Usage Rate: {recent_user_comments_filtered[recent_user_comments_filtered['user_type'] == 'Human']['contains_slang'].mean():.2%}\")\n",
         "print(f\"Bot Slang Usage Rate: {recent_user_comments_filtered[recent_user_comments_filtered['user_type'] == 'Bot']['contains_slang'].mean():.2%}\")"
       ],
-      "id": "a6dd6649",
+      "id": "024a31bf",
       "execution_count": null,
       "outputs": []
     },
@@ -1641,7 +1641,7 @@
         "for subreddit, text in top_subreddits.items():\n",
         "    generate_word_cloud(text, f'Word Cloud for /r/{subreddit}')"
       ],
-      "id": "efda59e2",
+      "id": "80a1619f",
       "execution_count": null,
       "outputs": []
     },
@@ -1710,7 +1710,7 @@
         "\n",
         "subreddit_top_terms = get_top_features(tfidf_matrix, feature_names)"
       ],
-      "id": "30e26c79",
+      "id": "dca481a6",
       "execution_count": null,
       "outputs": []
     },
@@ -1817,7 +1817,7 @@
         "    else:\n",
         "        print(f\"No valid keywords extracted for /r/{subreddit}.\")"
       ],
-      "id": "87a79336",
+      "id": "236c7c4f",
       "execution_count": null,
       "outputs": []
     }
